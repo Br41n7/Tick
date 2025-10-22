@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: entertainment-platform
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: "./entertainment_build.sh"
+    startCommand: "gunicorn entertainment_project.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: DATABASE_URL
+        fromDatabase:
+          name: entertainment_db
+          property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DJANGO_SETTINGS_MODULE
+        value: entertainment_project.settings
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: DEBUG
+        value: False
+      - key: PAYSTACK_PUBLIC_KEY
+        sync: false
+      - key: PAYSTACK_SECRET_KEY
+        sync: false
+      - key: ADMIN_COMMISSION_RATE
+        value: 0.10
+
+databases:
+  - name: entertainment_db
+    databaseName: entertainment_database
+    user: entertainment_user
+    region: oregon
+    plan: starter
