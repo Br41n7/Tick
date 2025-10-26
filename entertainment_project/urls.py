@@ -11,9 +11,9 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('', include('core.urls')),
     path('events/', include('events.urls')),
-    path('artists/', include('artists.urls')),
-    path('payments/', include('payments.urls')),
-    path('user/', include('accounts.urls')),
+    # path('artists/', include('artists.urls')),
+    # path('payments/', include('payments.urls')),
+    # path('user/', include('accounts.urls')),
 ]
 
 # Serve media files in development

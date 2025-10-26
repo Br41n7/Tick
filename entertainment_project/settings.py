@@ -5,7 +5,7 @@ Django settings for entertainment_project.
 from pathlib import Path
 import os
 import environ
-import dj_database_url
+# import dj_database_url  # Using SQLite for development
 
 # Build paths inside the project
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,10 +46,10 @@ INSTALLED_APPS = [
     
     # Local apps
     'accounts.apps.AccountsConfig',
- #   'events.apps.EventsConfig',
-  #  'artists.apps.ArtistsConfig',
-#    'payments.apps.PaymentsConfig',
- #   'core.apps.CoreConfig',
+ 'events.apps.EventsConfig',
+  'artists.apps.ArtistsConfig',
+'payments.apps.PaymentsConfig',
+ 'core.apps.CoreConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,94 +1,68 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.utils.translation import gettext_lazy as _
 from .models import CustomUser, RoleUpgradeRequest
 
-
 @admin.register(CustomUser)
-class CustomUserAdmin(UserAdmin):
-    """Custom admin for CustomUser model."""
+class UserAdmin(BaseUserAdmin):
+    list_display = ['email', 'first_name', 'last_name', 'get_display_role', 'is_staff', 'date_joined']
+    list_filter = ['is_staff', 'is_superuser', 'is_active', 'is_artist', 'is_host', 'date_joined']
+    search_fields = ['email', 'first_name', 'last_name']
+    ordering = ['-date_joined']
     
-    list_display = ['email', 'username', 'get_display_role', 'is_artist', 'is_host', 
-                    'is_staff', 'created_at']
-    list_filter = ['role', 'is_artist', 'is_host', 'is_staff', 'is_superuser', 'is_active']
-    search_fields = ['email', 'username', 'first_name', 'last_name']
-    ordering = ['-created_at']
+    fieldsets = (
+        (None, {'fields': ('email', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'phone_number', 'avatar', 'bio')}),
+        (_('Role Settings'), {
+            'fields': ('role', 'is_artist', 'is_host'),
+            'description': 'Configure user roles. Users can have multiple roles (artist + host).'
+        }),
+        (_('Permissions'), {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
     
-    fieldsets = UserAdmin.fieldsets + (
-        ('Profile Information', {
-            'fields': ('phone_number', 'avatar', 'bio')
-        }),
-        ('Role Management', {
-            'fields': ('role', 'is_artist', 'is_host')
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at')
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2'),
         }),
     )
     
-    readonly_fields = ['created_at', 'updated_at']
-    
-    actions = ['make_artist', 'make_host', 'make_both']
-    
-    def make_artist(self, request, queryset):
-        """Admin action to upgrade users to artist."""
-        for user in queryset:
-            user.upgrade_to_artist()
-        self.message_user(request, f"{queryset.count()} users upgraded to Artist.")
-    make_artist.short_description = "Upgrade to Artist"
-    
-    def make_host(self, request, queryset):
-        """Admin action to upgrade users to host."""
-        for user in queryset:
-            user.upgrade_to_host()
-        self.message_user(request, f"{queryset.count()} users upgraded to Host.")
-    make_host.short_description = "Upgrade to Host"
-    
-    def make_both(self, request, queryset):
-        """Admin action to give users both roles."""
-        for user in queryset:
-            user.upgrade_to_artist()
-            user.upgrade_to_host()
-        self.message_user(request, f"{queryset.count()} users upgraded to Artist & Host.")
-    make_both.short_description = "Upgrade to Artist & Host"
-
+    readonly_fields = ['date_joined', 'last_login']
 
 @admin.register(RoleUpgradeRequest)
 class RoleUpgradeRequestAdmin(admin.ModelAdmin):
-    """Admin for role upgrade requests."""
-    
-    list_display = ['user', 'request_type', 'status', 'created_at']
+    list_display = ['user', 'request_type', 'status', 'created_at', 'processed_by']
     list_filter = ['request_type', 'status', 'created_at']
-    search_fields = ['user__email', 'user__username', 'reason']
+    search_fields = ['user__email', 'reason', 'admin_notes']
     readonly_fields = ['created_at', 'updated_at']
-    
-    fieldsets = (
-        ('Request Information', {
-            'fields': ('user', 'request_type', 'reason', 'status')
-        }),
-        ('Admin Response', {
-            'fields': ('admin_notes', 'processed_by')
-        }),
-        ('Timestamps', {
-            'fields': ('created_at', 'updated_at')
-        }),
-    )
     
     actions = ['approve_requests', 'reject_requests']
     
+    fieldsets = (
+        ('Request Details', {
+            'fields': ('user', 'request_type', 'reason')
+        }),
+        ('Admin Response', {
+            'fields': ('status', 'processed_by', 'admin_notes')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
     def approve_requests(self, request, queryset):
-        """Approve selected upgrade requests."""
         count = 0
         for upgrade_request in queryset.filter(status='pending'):
             upgrade_request.approve(request.user)
             count += 1
-        self.message_user(request, f"{count} requests approved.")
-    approve_requests.short_description = "Approve selected requests"
+        self.message_user(request, f'{count} upgrade requests approved.')
+    approve_requests.short_description = 'Approve selected requests'
     
     def reject_requests(self, request, queryset):
-        """Reject selected upgrade requests."""
-        count = 0
-        for upgrade_request in queryset.filter(status='pending'):
-            upgrade_request.reject(request.user)
-            count += 1
-        self.message_user(request, f"{count} requests rejected.")
-    reject_requests.short_description = "Reject selected requests"
+        count = queryset.filter(status='pending').update(status='rejected')
+        self.message_user(request, f'{count} upgrade requests rejected.')
+    reject_requests.short_description = 'Reject selected requests'

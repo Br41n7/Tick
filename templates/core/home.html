@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Tick Entertainment</title>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block content %}
+    <div class="container mt-4">
+        <h1>Welcome to Tick Entertainment</h1>
+        <p>Your premier platform for events, artists, and entertainment booking.</p>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Featured Events</h3>
+                {% if featured_events %}
+                    {% for event in featured_events %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text">{{ event.short_description }}</p>
+                                <a href="{{ event.get_absolute_url }}" class="btn btn-primary">View Event</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No featured events available.</p>
+                {% endif %}
+            </div>
+            
+            <div class="col-md-6">
+                <h3>Featured Artists</h3>
+                {% if featured_artists %}
+                    {% for artist in featured_artists %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ artist.stage_name }}</h5>
+                                <p class="card-text">{{ artist.bio|truncatewords:20 }}</p>
+                                <a href="#" class="btn btn-outline-primary">View Profile</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No featured artists available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+</body>
+</html>
