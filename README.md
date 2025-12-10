@@ -584,4 +584,4 @@ For questions or support:
 
 **Built with ❤️ using Django**
 
-**Status**: ✅ Not Ready# Tick
+**Status**: ✅ Ready# Tick

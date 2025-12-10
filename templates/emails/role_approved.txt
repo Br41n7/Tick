@@ -1,0 +1,8 @@
+Hi {{ user.get_full_name }},
+
+Congratulations — your role upgrade request ({{ request_obj.get_request_type_display }}) has been approved. Your account roles have been updated.
+
+Log in to your dashboard to see new tools and features.
+
+Thanks,
+Tick Entertainment Team

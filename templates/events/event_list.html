@@ -1,0 +1,478 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Events - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .events-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 60px 0;
+        margin-bottom: 40px;
+    }
+
+    .events-hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+    }
+
+    .filters-sidebar {
+        position: sticky;
+        top: 80px;
+        height: fit-content;
+    }
+
+    .filter-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .filter-title {
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 20px;
+        font-size: 1.1rem;
+    }
+
+    .filter-group {
+        margin-bottom: 20px;
+    }
+
+    .filter-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .filter-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        color: #6c757d;
+        margin-bottom: 10px;
+        transition: color 0.2s;
+    }
+
+    .filter-label:hover {
+        color: #ff6b6b;
+    }
+
+    .filter-label input {
+        cursor: pointer;
+    }
+
+    .search-box {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e9ecef;
+        border-radius: 5px;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+
+    .search-box:focus {
+        outline: none;
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+
+    .events-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .event-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-image-container {
+        position: relative;
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        overflow: hidden;
+    }
+
+    .event-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .event-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #ff6b6b;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .event-badge.free {
+        background: #00b894;
+    }
+
+    .event-badge.upcoming {
+        background: #4ecdc4;
+    }
+
+    .event-body {
+        padding: 25px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .event-category {
+        display: inline-block;
+        background: #f8f9fa;
+        color: #ff6b6b;
+        padding: 6px 12px;
+        border-radius: 5px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        width: fit-content;
+    }
+
+    .event-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 12px;
+        line-height: 1.4;
+    }
+
+    .event-description {
+        color: #6c757d;
+        font-size: 0.95rem;
+        margin-bottom: 15px;
+        flex-grow: 1;
+    }
+
+    .event-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .meta-item i {
+        color: #ff6b6b;
+        width: 20px;
+        text-align: center;
+    }
+
+    .event-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .event-price {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ff6b6b;
+    }
+
+    .event-price.free {
+        color: #00b894;
+    }
+
+    .event-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .event-actions .btn {
+        font-size: 0.85rem;
+        padding: 8px 12px;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 40px 0;
+    }
+
+    .page-link {
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid #e9ecef;
+        color: #ff6b6b;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .page-link:hover {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .page-link.active {
+        background: #ff6b6b;
+        color: white;
+        border-color: #ff6b6b;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        grid-column: 1 / -1;
+    }
+
+    .empty-icon {
+        font-size: 5rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+        .events-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .events-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filters-sidebar {
+            position: static;
+            margin-bottom: 30px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="events-hero">
+    <div class="container">
+        <h1>Discover Amazing Events</h1>
+        <p>Find and book tickets to your favorite events</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+            <div class="filters-sidebar">
+                <div class="filter-card">
+                    <input type="text" class="search-box" id="searchInput" placeholder="Search events...">
+                    
+                    <div class="filter-title">Date</div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="radio" name="date" value="" checked>
+                            All Dates
+                        </label>
+                        <label class="filter-label">
+                            <input type="radio" name="date" value="today">
+                            Today
+                        </label>
+                        <label class="filter-label">
+                            <input type="radio" name="date" value="week">
+                            This Week
+                        </label>
+                        <label class="filter-label">
+                            <input type="radio" name="date" value="month">
+                            This Month
+                        </label>
+                    </div>
+
+                    <div class="filter-title" style="margin-top: 30px;">Price</div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="radio" name="price" value="" checked>
+                            All Prices
+                        </label>
+                        <label class="filter-label">
+                            <input type="radio" name="price" value="free">
+                            Free Events
+                        </label>
+                        <label class="filter-label">
+                            <input type="radio" name="price" value="paid">
+                            Paid Events
+                        </label>
+                    </div>
+
+                    {% if categories %}
+                    <div class="filter-title" style="margin-top: 30px;">Category</div>
+                    <div class="filter-group">
+                        <label class="filter-label">
+                            <input type="radio" name="category" value="" checked>
+                            All Categories
+                        </label>
+                        {% for category in categories %}
+                        <label class="filter-label">
+                            <input type="radio" name="category" value="{{ category.slug }}">
+                            {{ category.name }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <button onclick="applyFilters()" class="btn btn-primary w-100" style="margin-top: 20px;">
+                        <i class="bi bi-funnel"></i> Apply Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Events Grid -->
+        <div class="col-lg-9">
+            {% if page_obj %}
+                <div class="events-grid">
+                    {% for event in page_obj %}
+                    <div class="event-card">
+                        <div class="event-image-container">
+                            {% if event.image %}
+                                <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
+                            {% else %}
+                                <div class="event-image"></div>
+                            {% endif %}
+                            {% if event.is_free %}
+                                <span class="event-badge free">FREE</span>
+                            {% else %}
+                                <span class="event-badge">Paid</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="event-body">
+                            {% if event.category %}
+                            <div class="event-category">{{ event.category.name }}</div>
+                            {% endif %}
+
+                            <h3 class="event-title">{{ event.title }}</h3>
+                            <p class="event-description">{{ event.short_description|truncatewords:15 }}</p>
+
+                            <div class="event-meta">
+                                <div class="meta-item">
+                                    <i class="bi bi-calendar3"></i>
+                                    <span>{{ event.start_date|date:"M d, Y H:i" }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="bi bi-geo-alt"></i>
+                                    <span>{{ event.venue_name }}</span>
+                                </div>
+                                <div class="meta-item">
+                                    <i class="bi bi-people"></i>
+                                    <span>Available Seats: {{ event.available_seats|default:"Unlimited" }}</span>
+                                </div>
+                            </div>
+
+                            <div class="event-footer">
+                                <div class="event-price {% if event.is_free %}free{% endif %}">
+                                    {% if event.is_free %}
+                                        FREE
+                                    {% else %}
+                                        ₦{{ event.ticket_price }}
+                                    {% endif %}
+                                </div>
+                                <div class="event-actions">
+                                    <a href="{% url 'events:event_detail' event.slug %}" class="btn btn-sm btn-primary">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-primary" title="Add to favorites">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if page_obj.has_other_pages %}
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1" class="page-link">First</a>
+                        <a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <span class="page-link active">{{ num }}</span>
+                        {% else %}
+                            <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="events-grid">
+                    <div class="empty-state">
+                        <div class="empty-icon"><i class="bi bi-calendar-event"></i></div>
+                        <h2 class="empty-title">No events found</h2>
+                        <p>Try adjusting your search filters</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function applyFilters() {
+        const date = document.querySelector('input[name="date"]:checked')?.value || '';
+        const price = document.querySelector('input[name="price"]:checked')?.value || '';
+        const category = document.querySelector('input[name="category"]:checked')?.value || '';
+        const search = document.getElementById('searchInput').value;
+
+        let url = '?';
+        if (search) url += 'search=' + encodeURIComponent(search) + '&';
+        if (date) url += 'date=' + date + '&';
+        if (price) url += 'price=' + price + '&';
+        if (category) url += 'category=' + category;
+
+        window.location.href = url;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Upload Reel - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+.container { max-width:900px }
+.form-card { background:white; padding:24px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06) }
+.upload-drop { border:2px dashed #e9ecef; padding:30px; text-align:center; border-radius:8px; cursor:pointer }
+.preview { margin-top:16px }
+.small { font-size:0.9rem; color:#6c757d }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="form-card">
+        <h2>Upload Reel</h2>
+        <p class="small">Share short videos to engage your fans. MP4 preferred, max 200MB.</p>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group mt-3">
+                <label for="id_title">Title</label>
+                <input type="text" name="title" id="id_title" class="form-control" required value="{{ form.title.value|default_if_none:'' }}">
+                {% if form.title.errors %}<div class="text-danger">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group mt-3">
+                <label for="id_description">Description</label>
+                <textarea name="description" id="id_description" class="form-control">{{ form.description.value|default_if_none:'' }}</textarea>
+                {% if form.description.errors %}<div class="text-danger">{{ form.description.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Video File</label>
+                <div class="upload-drop" onclick="document.getElementById('id_video').click()">
+                    <i class="bi bi-file-earmark-play" style="font-size:28px;color:#ff6b6b"></i>
+                    <div>Click to choose a video or drag it here</div>
+                    <div class="small">Supported: MP4, MOV. Max 200MB</div>
+                </div>
+                <input type="file" name="video" id="id_video" accept="video/*" style="display:none">
+                {% if form.video.errors %}<div class="text-danger">{{ form.video.errors.0 }}</div>{% endif %}
+                <div id="preview" class="preview"></div>
+            </div>
+
+            <div class="form-row mt-3">
+                <div class="form-group col-md-6">
+                    <label for="id_is_public">Visibility</label>
+                    <select name="is_public" id="id_is_public" class="form-control">
+                        <option value="1">Public</option>
+                        <option value="0">Private</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="id_tags">Tags (comma-separated)</label>
+                    <input type="text" name="tags" id="id_tags" class="form-control">
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Upload Reel</button>
+                <a href="{% url 'artists:manage_reels' %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const fileInput = document.getElementById('id_video');
+    const preview = document.getElementById('preview');
+    fileInput && fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        preview.innerHTML = `<video controls src="${url}" style="max-width:100%; height:auto; border-radius:6px"></video>`;
+    });
+</script>
+{% endblock %}

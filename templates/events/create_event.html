@@ -1,0 +1,548 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Create Event - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .create-event-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 50px 0;
+        margin-bottom: 40px;
+    }
+
+    .create-event-hero h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .form-container {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto 40px;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+    }
+
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-group small {
+        display: block;
+        color: #6c757d;
+        margin-top: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .image-upload {
+        position: relative;
+        border: 2px dashed #e9ecef;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: #f8f9fa;
+    }
+
+    .image-upload:hover {
+        border-color: #ff6b6b;
+        background: #fff5f5;
+    }
+
+    .image-upload input[type="file"] {
+        display: none;
+    }
+
+    .image-upload-icon {
+        font-size: 2.5rem;
+        color: #ff6b6b;
+        margin-bottom: 10px;
+    }
+
+    .image-upload-text {
+        color: #2d3436;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+
+    .image-upload-subtext {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .image-preview {
+        position: relative;
+        margin-top: 20px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 250px;
+        object-fit: cover;
+    }
+
+    .image-remove {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-remove:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    .checkbox-group {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        cursor: pointer;
+        width: 18px;
+        height: 18px;
+    }
+
+    .checkbox-item label {
+        margin: 0;
+        font-weight: 400;
+        cursor: pointer;
+        color: #495057;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        border-left: 4px solid #ff6b6b;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .info-box strong {
+        color: #2d3436;
+    }
+
+    .info-box p {
+        color: #6c757d;
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn-submit {
+        padding: 12px 40px;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-submit.primary {
+        background: linear-gradient(135deg, #ff6b6b, #f85032);
+        color: white;
+    }
+
+    .btn-submit.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-submit.secondary {
+        background: white;
+        color: #ff6b6b;
+        border: 2px solid #ff6b6b;
+    }
+
+    .btn-submit.secondary:hover {
+        background: #fff5f5;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 8px;
+    }
+
+    .success-message {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .form-container {
+            padding: 20px;
+        }
+
+        .create-event-hero h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-submit {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="create-event-hero">
+    <div class="container">
+        <h1><i class="bi bi-calendar-plus"></i> Create New Event</h1>
+        <p>Host an amazing event and attract attendees</p>
+    </div>
+</div>
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="form-container" id="createEventForm">
+        {% csrf_token %}
+
+        <!-- Basic Information -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-info-circle"></i> Basic Information</h2>
+            
+            <div class="form-group">
+                <label for="title">Event Title *</label>
+                <input type="text" id="title" name="title" class="form-control" placeholder="Enter event title" required>
+                <small>Make it catchy and descriptive (maximum 200 characters)</small>
+                {% if form.title.errors %}<span class="error-message">{{ form.title.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="description">Event Description *</label>
+                <textarea id="description" name="description" class="form-control" placeholder="Describe your event in detail..." required></textarea>
+                <small>Include details about what attendees can expect</small>
+                {% if form.description.errors %}<span class="error-message">{{ form.description.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="category">Category *</label>
+                    <select id="category" name="category" class="form-control" required>
+                        <option value="">-- Select Category --</option>
+                        <option value="music">Music & Concerts</option>
+                        <option value="sports">Sports</option>
+                        <option value="conference">Conference & Business</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="community">Community & Culture</option>
+                        <option value="education">Education & Workshop</option>
+                    </select>
+                    {% if form.category.errors %}<span class="error-message">{{ form.category.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="tags">Tags (comma-separated)</label>
+                    <input type="text" id="tags" name="tags" class="form-control" placeholder="e.g., live music, free entry, outdoor">
+                    <small>Help people discover your event</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date & Time -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-calendar3"></i> Date & Time</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">Start Date & Time *</label>
+                    <input type="datetime-local" id="start_date" name="start_date" class="form-control" required>
+                    {% if form.start_date.errors %}<span class="error-message">{{ form.start_date.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="end_date">End Date & Time *</label>
+                    <input type="datetime-local" id="end_date" name="end_date" class="form-control" required>
+                    {% if form.end_date.errors %}<span class="error-message">{{ form.end_date.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>Tip:</strong>
+                <p>Make sure your end date is after the start date. Events are timezone-aware.</p>
+            </div>
+        </div>
+
+        <!-- Venue Information -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-geo-alt"></i> Venue Information</h2>
+            
+            <div class="form-group">
+                <label for="venue_name">Venue Name *</label>
+                <input type="text" id="venue_name" name="venue_name" class="form-control" placeholder="e.g., National Stadium, Lekki" required>
+                {% if form.venue_name.errors %}<span class="error-message">{{ form.venue_name.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="form-group">
+                <label for="venue_address">Venue Address *</label>
+                <input type="text" id="venue_address" name="venue_address" class="form-control" placeholder="Full address including street, city, state" required>
+                {% if form.venue_address.errors %}<span class="error-message">{{ form.venue_address.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="city">City *</label>
+                    <input type="text" id="city" name="city" class="form-control" placeholder="e.g., Lagos" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State/Region *</label>
+                    <input type="text" id="state" name="state" class="form-control" placeholder="e.g., Lagos" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ticketing -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-ticket"></i> Ticketing</h2>
+            
+            <div class="form-group">
+                <label for="capacity">Total Capacity *</label>
+                <input type="number" id="capacity" name="capacity" class="form-control" placeholder="Total number of attendees" min="1" required>
+                <small>How many people can attend?</small>
+                {% if form.capacity.errors %}<span class="error-message">{{ form.capacity.errors.0 }}</span>{% endif %}
+            </div>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="is_free" name="is_free" value="on" onchange="togglePricing()">
+                    <label for="is_free">This is a Free Event</label>
+                </div>
+            </div>
+
+            <div id="pricingSection">
+                <div class="form-group">
+                    <label for="ticket_price">Ticket Price (₦) *</label>
+                    <input type="number" id="ticket_price" name="ticket_price" class="form-control" placeholder="0" min="0" step="100">
+                    <small>Price per ticket in Nigerian Naira</small>
+                    {% if form.ticket_price.errors %}<span class="error-message">{{ form.ticket_price.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Event Image -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-image"></i> Event Image</h2>
+            
+            <div class="form-group">
+                <label for="image">Event Cover Image</label>
+                <div class="image-upload" onclick="document.getElementById('image').click()">
+                    <div class="image-upload-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+                    <div class="image-upload-text">Click to upload or drag and drop</div>
+                    <div class="image-upload-subtext">PNG, JPG, GIF up to 10MB</div>
+                    <input type="file" id="image" name="image" accept="image/*">
+                </div>
+                <div id="imagePreview"></div>
+            </div>
+
+            <div class="info-box">
+                <strong>Image Tips:</strong>
+                <p>Use high-quality images with good lighting. Recommended size: 1200x600px</p>
+            </div>
+        </div>
+
+        <!-- Additional Settings -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-sliders"></i> Additional Settings</h2>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="is_published" name="is_published" value="on" checked>
+                    <label for="is_published">Publish this event immediately</label>
+                </div>
+            </div>
+
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="allow_registration" name="allow_registration" value="on" checked>
+                    <label for="allow_registration">Allow guest registration</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="event_url">Event Website (Optional)</label>
+                <input type="url" id="event_url" name="event_url" class="form-control" placeholder="https://youreventwebsite.com">
+                <small>External link for more information</small>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn-submit primary">
+                <i class="bi bi-check-circle"></i> Create Event
+            </button>
+            <a href="{% url 'events:event_list' %}" class="btn-submit secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Image upload preview
+    document.getElementById('image').addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = `
+                    <div class="image-preview">
+                        <img src="${event.target.result}" alt="Preview">
+                        <button type="button" class="image-remove" onclick="removeImage()">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </div>
+                `;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function removeImage() {
+        document.getElementById('image').value = '';
+        document.getElementById('imagePreview').innerHTML = '';
+    }
+
+    function togglePricing() {
+        const isFree = document.getElementById('is_free').checked;
+        const pricingSection = document.getElementById('pricingSection');
+        const priceInput = document.getElementById('ticket_price');
+        
+        if (isFree) {
+            pricingSection.style.display = 'none';
+            priceInput.value = '0';
+            priceInput.required = false;
+        } else {
+            pricingSection.style.display = 'block';
+            priceInput.required = true;
+        }
+    }
+
+    // Form submission
+    document.getElementById('createEventForm').addEventListener('submit', function(e) {
+        const startDate = new Date(document.getElementById('start_date').value);
+        const endDate = new Date(document.getElementById('end_date').value);
+        
+        if (endDate <= startDate) {
+            e.preventDefault();
+            alert('End date must be after start date');
+            return false;
+        }
+
+        const isFree = document.getElementById('is_free').checked;
+        if (!isFree) {
+            const price = parseFloat(document.getElementById('ticket_price').value);
+            if (!price || price <= 0) {
+                e.preventDefault();
+                alert('Please enter a valid ticket price for paid events');
+                return false;
+            }
+        }
+    });
+
+    // Initialize pricing section
+    togglePricing();
+</script>
+{% endblock %}

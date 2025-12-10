@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ reel.title }} - Reel{% endblock %}
+
+{% block extra_css %}
+<style>
+.container{max-width:900px}
+.reel-player{background:#000; border-radius:8px; overflow:hidden}
+.reel-meta{margin-top:12px}
+.actions{display:flex; gap:8px; margin-top:12px}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="reel-player">
+        {% if reel.video %}
+            <video src="{{ reel.video.url }}" controls style="width:100%; height:auto"></video>
+        {% else %}
+            <div style="padding:80px; text-align:center; color:#fff">No video available</div>
+        {% endif %}
+    </div>
+
+    <div class="reel-meta">
+        <h3>{{ reel.title }}</h3>
+        <p class="small text-muted">By {{ reel.artist.stage_name }} · {{ reel.view_count }} views · {{ reel.like_count }} likes</p>
+        <p>{{ reel.description }}</p>
+
+        <div class="actions">
+            <form id="likeForm" method="POST" action="{% url 'artists:like_reel' reel.slug %}">{% csrf_token %}
+                <button type="submit" class="btn btn-outline-primary">Like</button>
+            </form>
+            <form method="POST" action="{% url 'artists:share_reel' reel.slug %}">{% csrf_token %}
+                <input type="hidden" name="platform" value="twitter">
+                <button type="submit" class="btn btn-outline-secondary">Share</button>
+            </form>
+            {% if request.user == reel.artist.user %}
+                <a href="{% url 'artists:edit_reel' reel.pk %}" class="btn btn-outline-secondary">Edit</a>
+                <a href="{% url 'artists:delete_reel' reel.pk %}" class="btn btn-danger">Delete</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

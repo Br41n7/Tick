@@ -118,7 +118,21 @@ class RoleUpgradeRequest(models.Model):
     request_type = models.CharField(max_length=20, choices=REQUEST_TYPE_CHOICES)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     reason = models.TextField(help_text="Why do you want this upgrade?")
-    
+
+    # KYC fields (uploaded by the user as part of upgrade request)
+    KYC_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('rejected', 'Rejected'),
+    ]
+    kyc_id_type = models.CharField(max_length=50, blank=True, null=True)
+    kyc_id_number = models.CharField(max_length=100, blank=True, null=True)
+    kyc_document = models.FileField(upload_to='kyc_docs/', blank=True, null=True)
+    kyc_status = models.CharField(max_length=20, choices=KYC_STATUS_CHOICES, default='pending')
+    kyc_submitted_at = models.DateTimeField(blank=True, null=True)
+    kyc_verified_at = models.DateTimeField(blank=True, null=True)
+    kyc_reject_reason = models.TextField(blank=True, null=True)
+
     # Admin response
     admin_notes = models.TextField(blank=True, null=True)
     processed_by = models.ForeignKey(
@@ -140,15 +154,34 @@ class RoleUpgradeRequest(models.Model):
     
     def approve(self, admin_user):
         """Approve the upgrade request."""
+        # Require KYC verification before approving
+        if getattr(self, 'kyc_status', None) != 'verified':
+            raise ValueError('KYC must be verified before approving this request.')
+
         self.status = 'approved'
         self.processed_by = admin_user
         self.save()
-        
+
         # Upgrade the user
         if self.request_type == 'to_artist':
             self.user.upgrade_to_artist()
         elif self.request_type == 'to_host':
             self.user.upgrade_to_host()
+
+    def verify_kyc(self, admin_user, verified=True, notes=''):
+        """Admin verifies or rejects KYC for this request."""
+        if verified:
+            self.kyc_status = 'verified'
+            from django.utils import timezone
+            self.kyc_verified_at = timezone.now()
+            self.admin_notes = notes or self.admin_notes
+            self.processed_by = admin_user
+            self.save()
+        else:
+            self.kyc_status = 'rejected'
+            self.kyc_reject_reason = notes
+            self.processed_by = admin_user
+            self.save()
     
     def reject(self, admin_user, notes=''):
         """Reject the upgrade request."""
@@ -156,3 +189,25 @@ class RoleUpgradeRequest(models.Model):
         self.processed_by = admin_user
         self.admin_notes = notes
         self.save()
+
+
+class KycAuditLog(models.Model):
+    """Audit log for KYC and role request actions."""
+    ACTION_CHOICES = [
+        ('kyc_verified', 'KYC Verified'),
+        ('kyc_rejected', 'KYC Rejected'),
+        ('role_approved', 'Role Approved'),
+        ('role_rejected', 'Role Rejected'),
+    ]
+
+    request = models.ForeignKey(RoleUpgradeRequest, on_delete=models.CASCADE, related_name='audit_logs')
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    admin = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL)
+    notes = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.request.user.email} - {self.get_action_display()} @ {self.created_at}"

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upgrade Your Role - Tick Entertainment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card card-themed mt-5">
+            <div class="card-body p-5">
+                <div class="text-center mb-4">
+                    <h2 class="brand-text">Upgrade Your Role</h2>
+                    <p class="text-muted">Choose a role to unlock new features</p>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+
+                    <!-- Role Selection -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Select Your Role</label>
+                        
+                        <div class="role-options">
+                            <!-- Artist Option -->
+                            <div class="role-card p-4 mb-3 border rounded-3 cursor-pointer" onclick="selectRole('artist')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="role" value="artist" id="roleArtist" required>
+                                    <label class="form-check-label w-100" for="roleArtist">
+                                        <h5 class="mb-2"><i class="bi bi-camera-video text-danger"></i> Artist</h5>
+                                        <small class="text-muted d-block">
+                                            • Upload and share short reels<br>
+                                            • Build your fan base<br>
+                                            • Earn from your content<br>
+                                            • Connect with fans
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Host Option -->
+                            <div class="role-card p-4 mb-3 border rounded-3 cursor-pointer" onclick="selectRole('host')">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="role" value="host" id="roleHost" required>
+                                    <label class="form-check-label w-100" for="roleHost">
+                                        <h5 class="mb-2"><i class="bi bi-calendar-event text-info"></i> Event Host</h5>
+                                        <small class="text-muted d-block">
+                                            • Create and host events<br>
+                                            • Manage bookings<br>
+                                            • Track revenue<br>
+                                            • Connect with performers
+                                        </small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reason/Message -->
+                    <div class="mb-4">
+                        <label for="reason" class="form-label fw-bold">Why do you want this role? (Optional)</label>
+                        <textarea class="form-control form-control-lg" id="reason" name="reason" rows="4" placeholder="Tell us why you want to upgrade your role..."></textarea>
+                        <small class="text-muted d-block mt-2">This helps us review your request faster.</small>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="btn btn-primary btn-lg w-100 site-hero-gradient text-white border-0">
+                        <i class="bi bi-arrow-up-circle me-2"></i> Request Role Upgrade
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a href="{% url 'accounts:dashboard' %}" class="text-muted">Back to dashboard</a>
+                    </div>
+                </form>
+
+                <!-- Info Box -->
+                <div class="alert alert-info mt-4 border-0">
+                    <i class="bi bi-info-circle me-2"></i>
+                    <strong>How it works:</strong> Submit your request and our admins will review it within 24-48 hours. You'll receive an email notification once approved.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .role-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .role-card:hover {
+        box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        border-color: var(--brand-start) !important;
+    }
+    .role-card input[type="radio"]:checked + label {
+        color: var(--brand-start);
+    }
+</style>
+
+<script>
+    function selectRole(role) {
+        document.getElementById('role' + role.charAt(0).toUpperCase() + role.slice(1)).checked = true;
+    }
+</script>
+{% endblock %}

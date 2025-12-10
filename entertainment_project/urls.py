@@ -8,12 +8,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('allauth.urls')),
+    path('accounts/auth/', include('allauth.urls')),
     path('', include('core.urls')),
     path('events/', include('events.urls')),
-    # path('artists/', include('artists.urls')),
+    path('artists/', include('artists.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('core/', include('core.urls')),
     # path('payments/', include('payments.urls')),
-    # path('user/', include('accounts.urls')),
 ]
 
 # Serve media files in development
@@ -22,6 +23,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 # Admin site customization
-admin.site.site_header = "Entertainment Platform Admin"
-admin.site.site_title = "Entertainment Platform"
-admin.site.index_title = "Welcome to Entertainment Platform Administration"
+admin.site.site_header = "Tick Admin Platform"
+admin.site.site_title = "Tick Platform"
+admin.site.index_title = "Welcome to Tick"

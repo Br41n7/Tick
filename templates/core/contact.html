@@ -1,0 +1,340 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Contact Us - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .contact-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 60px 0;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .contact-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .contact-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 40px;
+        margin-bottom: 50px;
+    }
+
+    .contact-form {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .contact-info {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .info-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        border-left: 4px solid #ff6b6b;
+    }
+
+    .info-icon {
+        font-size: 1.8rem;
+        color: #ff6b6b;
+        margin-bottom: 10px;
+    }
+
+    .info-title {
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 8px;
+    }
+
+    .info-content {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+
+    .info-content a {
+        color: #ff6b6b;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .info-content a:hover {
+        text-decoration: underline;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .submit-btn {
+        background: linear-gradient(135deg, #ff6b6b, #f85032);
+        color: white;
+        padding: 12px 40px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .success-message {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .faq-section {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+        margin-bottom: 40px;
+    }
+
+    .faq-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 25px;
+    }
+
+    .faq-item {
+        padding: 20px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .faq-item:last-child {
+        border-bottom: none;
+    }
+
+    .faq-question {
+        font-weight: 600;
+        color: #2d3436;
+        cursor: pointer;
+        margin-bottom: 10px;
+    }
+
+    .faq-answer {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .contact-hero h1 {
+            font-size: 1.8rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="contact-hero">
+    <div class="container">
+        <h1>Get In Touch</h1>
+        <p style="font-size: 1.1rem; opacity: 0.95;">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+    </div>
+</div>
+
+<div class="container contact-container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Contact Grid -->
+    <div class="contact-grid">
+        <!-- Contact Form -->
+        <div class="contact-form">
+            <h3 style="margin-bottom: 25px; color: #2d3436;">Send Us a Message</h3>
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label for="name">Full Name *</label>
+                    <input type="text" id="name" name="name" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address *</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Subject *</label>
+                    <input type="text" id="subject" name="subject" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" class="form-control" required></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="contact-info">
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-envelope-fill"></i></div>
+                <div class="info-title">Email</div>
+                <div class="info-content">
+                    <a href="mailto:support@tick.com">support@tick.com</a><br>
+                    <a href="mailto:info@tick.com">info@tick.com</a>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-telephone-fill"></i></div>
+                <div class="info-title">Phone</div>
+                <div class="info-content">
+                    <a href="tel:+234801234567">+234 (801) 234-5678</a><br>
+                    <span>Monday - Friday, 9am - 6pm</span>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-geo-alt-fill"></i></div>
+                <div class="info-title">Location</div>
+                <div class="info-content">
+                    123 Entertainment Street<br>
+                    Lagos, Nigeria<br>
+                    <strong>ZIP: 100001</strong>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon"><i class="bi bi-clock-fill"></i></div>
+                <div class="info-title">Response Time</div>
+                <div class="info-content">
+                    We typically respond to inquiries within 24 hours during business hours.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="faq-section">
+        <h3 class="faq-title">Frequently Asked Questions</h3>
+        
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> How do I book an event?</div>
+            <div class="faq-answer">
+                Simply browse our events, select the one you're interested in, choose your tickets, and complete the secure payment. You'll receive a digital ticket via email and SMS.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> Can I get a refund for my booking?</div>
+            <div class="faq-answer">
+                Refunds are available up to 48 hours before the event, subject to the event organizer's cancellation policy. Check your booking details for specific terms.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> How do I become an event host?</div>
+            <div class="faq-answer">
+                Sign up for an account, complete your profile, and request to become a host. Our team will review your application and provide feedback within 5 business days.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> Is my payment information secure?</div>
+            <div class="faq-answer">
+                Yes! We use industry-standard SSL encryption and work with trusted payment processors. Your payment information is never stored on our servers.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> How do I follow an artist?</div>
+            <div class="faq-answer">
+                Visit any artist's profile and click the "Follow" button. You'll receive updates about their new reels, upcoming events, and announcements.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question"><i class="bi bi-chevron-right"></i> Can I upload reels as an artist?</div>
+            <div class="faq-answer">
+                Yes! Once you upgrade to an artist account, you can upload reels directly from your dashboard. Share your content and engage with your fans.
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Links -->
+    <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08); margin-bottom: 50px;">
+        <h3 style="margin-bottom: 20px; color: #2d3436;">Follow Us on Social Media</h3>
+        <div style="display: flex; gap: 15px; justify-content: center; font-size: 1.5rem;">
+            <a href="#" style="color: #ff6b6b; text-decoration: none;"><i class="bi bi-facebook"></i></a>
+            <a href="#" style="color: #ff6b6b; text-decoration: none;"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" style="color: #ff6b6b; text-decoration: none;"><i class="bi bi-instagram"></i></a>
+            <a href="#" style="color: #ff6b6b; text-decoration: none;"><i class="bi bi-youtube"></i></a>
+            <a href="#" style="color: #ff6b6b; text-decoration: none;"><i class="bi bi-linkedin"></i></a>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

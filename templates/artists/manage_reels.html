@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Reels - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .manage-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+
+    .reels-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .reel-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .reel-thumb {
+        height: 200px;
+        background: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+    }
+
+    .reel-body {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .reel-title { font-weight: 700; color: #2d3436; }
+    .reel-meta { color: #6c757d; font-size: 0.9rem; }
+
+    .reel-actions { display:flex; gap:8px; margin-top:auto; }
+
+    .empty-state { text-align:center; padding:40px; background:white; border-radius:12px; }
+
+    @media (max-width:768px){ .reel-thumb{height:160px} }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="manage-hero">
+    <div class="container">
+        <h1>My Reels</h1>
+        <p>Manage your uploaded reels — edit, publish, or delete them.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'artists:upload_reel' %}" class="btn btn-primary">
+            <i class="bi bi-cloud-upload"></i> Upload New Reel
+        </a>
+    </div>
+
+    {% if reels %}
+    <div class="reels-grid">
+        {% for reel in reels %}
+        <div class="reel-card">
+            <div class="reel-thumb">
+                {% if reel.thumbnail %}
+                    <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" style="width:100%; height:100%; object-fit:cover;">
+                {% else %}
+                    <div style="padding:20px;">{{ reel.title|truncatechars:30 }}</div>
+                {% endif %}
+            </div>
+
+            <div class="reel-body">
+                <div class="reel-title">{{ reel.title }}</div>
+                <div class="reel-meta">{{ reel.created_at|date:"M d, Y" }} · {{ reel.view_count }} views · {{ reel.like_count }} likes</div>
+
+                <div class="reel-actions">
+                    <a href="{% url 'artists:edit_reel' reel.pk %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                    <form action="{% url 'artists:delete_reel' reel.pk %}" method="POST" style="display:inline">{% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                    <a href="{% url 'artists:reel_detail' reel.slug %}" class="btn btn-sm btn-primary">View</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div style="font-size:48px;color:#dee2e6;margin-bottom:12px;"><i class="bi bi-film"></i></div>
+        <h3>No reels yet</h3>
+        <p>Create and share your first reel to engage fans.</p>
+        <a href="{% url 'artists:upload_reel' %}" class="btn btn-primary mt-2">Upload Reel</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

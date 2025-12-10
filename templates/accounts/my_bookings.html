@@ -1,0 +1,596 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Bookings - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .bookings-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 50px 0;
+        margin-bottom: 40px;
+    }
+
+    .bookings-hero h1 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .bookings-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #ff6b6b;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .filter-tabs {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 0;
+    }
+
+    .filter-tab {
+        padding: 15px 20px;
+        cursor: pointer;
+        color: #6c757d;
+        font-weight: 600;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+        margin-bottom: -2px;
+    }
+
+    .filter-tab:hover {
+        color: #ff6b6b;
+    }
+
+    .filter-tab.active {
+        color: #ff6b6b;
+        border-color: #ff6b6b;
+    }
+
+    .booking-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s;
+        display: grid;
+        grid-template-columns: 250px 1fr;
+    }
+
+    .booking-card:hover {
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .booking-image {
+        height: 200px;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        overflow: hidden;
+    }
+
+    .booking-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .booking-content {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 15px;
+    }
+
+    .booking-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin: 0 0 8px 0;
+    }
+
+    .booking-subtitle {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .booking-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .booking-badge.confirmed {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .booking-badge.pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .booking-badge.cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .booking-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 20px;
+        margin: 20px 0;
+        padding: 20px 0;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #6c757d;
+        font-size: 0.85rem;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .detail-value {
+        color: #2d3436;
+        font-size: 1rem;
+    }
+
+    .booking-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .booking-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .booking-btn.primary {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .booking-btn.primary:hover {
+        background: #f85032;
+    }
+
+    .booking-btn.secondary {
+        background: #f8f9fa;
+        color: #ff6b6b;
+        border: 1px solid #e9ecef;
+    }
+
+    .booking-btn.secondary:hover {
+        background: #e9ecef;
+    }
+
+    .booking-qr {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+
+    .booking-qr-icon {
+        font-size: 2rem;
+        color: #ff6b6b;
+    }
+
+    .booking-qr-text {
+        flex: 1;
+    }
+
+    .booking-qr-title {
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 3px;
+    }
+
+    .booking-qr-subtext {
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+
+    .booking-qr-btn {
+        padding: 8px 16px;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        color: #ff6b6b;
+    }
+
+    .booking-qr-btn:hover {
+        background: #f8f9fa;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 12px;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .empty-text {
+        color: #6c757d;
+        margin-bottom: 25px;
+    }
+
+    .empty-link {
+        display: inline-block;
+        padding: 12px 30px;
+        background: #ff6b6b;
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .empty-link:hover {
+        background: #f85032;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 40px 0;
+    }
+
+    .page-link {
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 1px solid #e9ecef;
+        color: #ff6b6b;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .page-link:hover {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .page-link.active {
+        background: #ff6b6b;
+        color: white;
+        border-color: #ff6b6b;
+    }
+
+    @media (max-width: 768px) {
+        .booking-card {
+            grid-template-columns: 1fr;
+        }
+
+        .booking-image {
+            height: 250px;
+        }
+
+        .booking-details {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-tabs {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+        }
+
+        .bookings-hero h1 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bookings-hero">
+    <div class="container">
+        <h1><i class="bi bi-ticket2"></i> My Bookings</h1>
+        <p>Manage all your event tickets and reservations</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Statistics -->
+    <div class="bookings-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_bookings }}</div>
+            <div class="stat-label">Total Bookings</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ upcoming_bookings }}</div>
+            <div class="stat-label">Upcoming Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ past_bookings }}</div>
+            <div class="stat-label">Past Events</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">₦{{ total_spent }}</div>
+            <div class="stat-label">Total Spent</div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterBookings('all')">All Bookings</button>
+        <button class="filter-tab" onclick="filterBookings('upcoming')">Upcoming</button>
+        <button class="filter-tab" onclick="filterBookings('past')">Past</button>
+        <button class="filter-tab" onclick="filterBookings('cancelled')">Cancelled</button>
+    </div>
+
+    <!-- Bookings List -->
+    {% if page_obj %}
+        <div id="bookingsList">
+            {% for booking in page_obj %}
+            <div class="booking-card" data-status="{{ booking.status }}">
+                <div class="booking-image">
+                    {% if booking.event.image %}
+                        <img src="{{ booking.event.image.url }}" alt="{{ booking.event.title }}">
+                    {% else %}
+                        <div style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4); height: 100%;"></div>
+                    {% endif %}
+                </div>
+
+                <div class="booking-content">
+                    <div>
+                        <div class="booking-header">
+                            <div>
+                                <h3 class="booking-title">{{ booking.event.title }}</h3>
+                                <p class="booking-subtitle">
+                                    <i class="bi bi-geo-alt"></i> {{ booking.event.venue_name }}
+                                </p>
+                            </div>
+                            <span class="booking-badge {{ booking.status|lower }}">
+                                {{ booking.get_status_display }}
+                            </span>
+                        </div>
+
+                        <div class="booking-details">
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-calendar"></i> Event Date</span>
+                                <span class="detail-value">{{ booking.event.start_date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-clock"></i> Time</span>
+                                <span class="detail-value">{{ booking.event.start_date|date:"H:i" }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-ticket"></i> Tickets</span>
+                                <span class="detail-value">{{ booking.quantity }} {{ booking.quantity|pluralize:"ticket,tickets" }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-cash"></i> Total Paid</span>
+                                <span class="detail-value">₦{{ booking.total_price }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-calendar2-check"></i> Booked On</span>
+                                <span class="detail-value">{{ booking.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label"><i class="bi bi-key"></i> Confirmation</span>
+                                <span class="detail-value">{{ booking.reference_code }}</span>
+                            </div>
+                        </div>
+
+                        {% if booking.status == 'confirmed' %}
+                        <div class="booking-qr">
+                            <div class="booking-qr-icon">
+                                <i class="bi bi-qr-code"></i>
+                            </div>
+                            <div class="booking-qr-text">
+                                <div class="booking-qr-title">E-Ticket Ready</div>
+                                <div class="booking-qr-subtext">Show this QR code at the venue</div>
+                            </div>
+                            <button class="booking-qr-btn" onclick="downloadTicket('{{ booking.id }}')">
+                                Download
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="booking-actions">
+                        <a href="{% url 'events:event_detail' booking.event.slug %}" class="booking-btn primary">
+                            <i class="bi bi-eye"></i> View Event
+                        </a>
+                        {% if booking.status == 'confirmed' %}
+                            <button class="booking-btn secondary" onclick="shareTicket('{{ booking.id }}')">
+                                <i class="bi bi-share"></i> Share
+                            </button>
+                            <button class="booking-btn secondary" onclick="cancelBooking('{{ booking.id }}')">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </button>
+                        {% elif booking.status == 'pending' %}
+                            <button class="booking-btn secondary" onclick="resendConfirmation('{{ booking.id }}')">
+                                <i class="bi bi-arrow-repeat"></i> Resend
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1" class="page-link">First</a>
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">Previous</a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="page-link active">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}" class="page-link">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="page-link">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">Last</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+            <h2 class="empty-title">No Bookings Yet</h2>
+            <p class="empty-text">You haven't booked any events yet. Start exploring events today!</p>
+            <a href="{% url 'events:event_list' %}" class="empty-link">
+                <i class="bi bi-calendar-plus"></i> Browse Events
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterBookings(status) {
+        // Update active tab
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        // Filter bookings
+        const bookings = document.querySelectorAll('[data-status]');
+        if (status === 'all') {
+            bookings.forEach(b => b.style.display = '');
+        } else {
+            bookings.forEach(b => {
+                b.style.display = b.getAttribute('data-status') === status ? '' : 'none';
+            });
+        }
+    }
+
+    function downloadTicket(bookingId) {
+        // Redirect to ticket download endpoint
+        window.location.href = `/bookings/${bookingId}/download/`;
+    }
+
+    function shareTicket(bookingId) {
+        const ticketUrl = window.location.href + `#booking-${bookingId}`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'My Event Ticket',
+                text: 'Check out this event I\'m attending!',
+                url: ticketUrl
+            });
+        } else {
+            // Fallback: copy to clipboard
+            navigator.clipboard.writeText(ticketUrl).then(() => {
+                alert('Ticket link copied to clipboard!');
+            });
+        }
+    }
+
+    function cancelBooking(bookingId) {
+        if (confirm('Are you sure you want to cancel this booking? This action cannot be undone.')) {
+            fetch(`/bookings/${bookingId}/cancel/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Booking cancelled successfully');
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+    }
+
+    function resendConfirmation(bookingId) {
+        fetch(`/bookings/${bookingId}/resend/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Confirmation email resent!');
+            } else {
+                alert('Error: ' + data.message);
+            }
+        });
+    }
+</script>
+{% endblock %}

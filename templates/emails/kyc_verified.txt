@@ -1,0 +1,8 @@
+Hi {{ user.get_full_name }},
+
+Your identity document for the role upgrade request ({{ request_obj.get_request_type_display }}) has been verified by our team.
+
+Admins will now process your role request — you'll be notified once it is approved.
+
+Thanks,
+Tick Entertainment Team

@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Profile - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .edit-profile-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 50px 0;
+        margin-bottom: 40px;
+    }
+
+    .edit-profile-hero h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    .profile-form-container {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 40px;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-section-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .avatar-section {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .avatar-display {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 3rem;
+        flex-shrink: 0;
+        overflow: hidden;
+    }
+
+    .avatar-display img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-actions {
+        flex: 1;
+    }
+
+    .avatar-label {
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .avatar-input-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .avatar-input {
+        display: none;
+    }
+
+    .avatar-btn {
+        padding: 10px 20px;
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .avatar-btn:hover {
+        background: #f85032;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .form-group small {
+        display: block;
+        color: #6c757d;
+        margin-top: 5px;
+        font-size: 0.85rem;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: #ff6b6b;
+        box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-group-full {
+        grid-column: 1 / -1;
+    }
+
+    .form-group.readonly {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 0.9rem;
+        margin-top: 8px;
+    }
+
+    .success-message {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+
+    .info-box {
+        background: #f8f9fa;
+        border-left: 4px solid #ff6b6b;
+        padding: 15px;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+
+    .info-box strong {
+        color: #2d3436;
+    }
+
+    .info-box p {
+        color: #6c757d;
+        margin: 5px 0 0 0;
+        font-size: 0.9rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        padding-top: 40px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .btn-action {
+        padding: 12px 40px;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-action.primary {
+        background: linear-gradient(135deg, #ff6b6b, #f85032);
+        color: white;
+    }
+
+    .btn-action.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(255, 107, 107, 0.3);
+    }
+
+    .btn-action.secondary {
+        background: white;
+        color: #ff6b6b;
+        border: 2px solid #ff6b6b;
+    }
+
+    .btn-action.secondary:hover {
+        background: #fff5f5;
+    }
+
+    .role-badge {
+        display: inline-block;
+        background: #f8f9fa;
+        color: #ff6b6b;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-right: 8px;
+    }
+
+    .social-links {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    .social-link {
+        border: 1px solid #e9ecef;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .social-link label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .social-link i {
+        font-size: 1.2rem;
+        color: #ff6b6b;
+    }
+
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+
+        .avatar-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-form-container {
+            padding: 20px;
+        }
+
+        .edit-profile-hero h1 {
+            font-size: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn-action {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="edit-profile-hero">
+    <div class="container">
+        <h1><i class="bi bi-pencil-square"></i> Edit Profile</h1>
+        <p>Update your profile information and preferences</p>
+    </div>
+</div>
+
+<div class="container">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="success-message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" enctype="multipart/form-data" class="profile-form-container" id="editProfileForm">
+        {% csrf_token %}
+
+        <!-- Profile Picture -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-image"></i> Profile Picture</h2>
+            
+            <div class="avatar-section">
+                <div class="avatar-display" id="avatarDisplay">
+                    {% if user.profile_picture %}
+                        <img src="{{ user.profile_picture.url }}" alt="Profile">
+                    {% else %}
+                        {{ user.first_name|first|upper }}
+                    {% endif %}
+                </div>
+                <div class="avatar-actions">
+                    <label class="avatar-label">Profile Photo</label>
+                    <div class="avatar-input-wrapper">
+                        <input type="file" id="profilePicture" name="profile_picture" class="avatar-input" accept="image/*">
+                        <button type="button" class="avatar-btn" onclick="document.getElementById('profilePicture').click()">
+                            <i class="bi bi-upload"></i> Change Photo
+                        </button>
+                    </div>
+                    <small>JPG, PNG up to 5MB</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Information -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-person"></i> Personal Information</h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name *</label>
+                    <input type="text" id="firstName" name="first_name" class="form-control" value="{{ user.first_name }}" required>
+                    {% if form.first_name.errors %}<span class="error-message">{{ form.first_name.errors.0 }}</span>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label for="lastName">Last Name *</label>
+                    <input type="text" id="lastName" name="last_name" class="form-control" value="{{ user.last_name }}" required>
+                    {% if form.last_name.errors %}<span class="error-message">{{ form.last_name.errors.0 }}</span>{% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control readonly" value="{{ user.email }}" readonly>
+                <small>Contact support to change your email</small>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone_number" class="form-control" value="{{ user.phone_number|default:'' }}" placeholder="+234801234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Account Type</label>
+                    <input type="text" id="role" class="form-control readonly" value="{{ user.get_display_role }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Display Name & Bio -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-chat-left-text"></i> Bio & Display</h2>
+            
+            <div class="form-group">
+                <label for="displayName">Display Name</label>
+                <input type="text" id="displayName" name="display_name" class="form-control" value="{{ user.display_name|default:'' }}" placeholder="How you want to be called">
+                <small>Leave blank to use your first and last name</small>
+            </div>
+
+            <div class="form-group">
+                <label for="bio">Bio</label>
+                <textarea id="bio" name="bio" class="form-control" placeholder="Tell us about yourself...">{{ user.bio|default:'' }}</textarea>
+                <small>Maximum 500 characters</small>
+            </div>
+        </div>
+
+        <!-- Artist Information (if user is an artist) -->
+        {% if user.is_artist %}
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-star"></i> Artist Profile</h2>
+            
+            <div class="info-box">
+                <strong>Artist Account:</strong>
+                <p>You have an artist account. Update your artist information below.</p>
+            </div>
+
+            <div class="form-group">
+                <label for="stageName">Stage Name *</label>
+                <input type="text" id="stageName" name="stage_name" class="form-control" value="{{ user.artist_profile.stage_name|default:'' }}" placeholder="Your artist name">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="genre">Primary Genre</label>
+                    <select id="genre" name="genre" class="form-control">
+                        <option value="">-- Select Genre --</option>
+                        <option value="afrobeats" {% if user.artist_profile.genre == 'afrobeats' %}selected{% endif %}>Afrobeats</option>
+                        <option value="hiphop" {% if user.artist_profile.genre == 'hiphop' %}selected{% endif %}>Hip-Hop</option>
+                        <option value="pop" {% if user.artist_profile.genre == 'pop' %}selected{% endif %}>Pop</option>
+                        <option value="jazz" {% if user.artist_profile.genre == 'jazz' %}selected{% endif %}>Jazz</option>
+                        <option value="comedy" {% if user.artist_profile.genre == 'comedy' %}selected{% endif %}>Comedy</option>
+                        <option value="other" {% if user.artist_profile.genre == 'other' %}selected{% endif %}>Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="followerCount">Followers Count</label>
+                    <input type="number" id="followerCount" name="follower_count" class="form-control readonly" value="{{ user.artist_profile.follower_count|default:0 }}" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Social Media Links (for artists) -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-link-45deg"></i> Social Media Links</h2>
+            
+            <div class="social-links">
+                <div class="social-link">
+                    <label for="instagram">
+                        <i class="bi bi-instagram"></i> Instagram
+                    </label>
+                    <input type="url" id="instagram" name="instagram_url" class="form-control" value="{{ user.artist_profile.instagram_url|default:'' }}" placeholder="https://instagram.com/username">
+                </div>
+
+                <div class="social-link">
+                    <label for="twitter">
+                        <i class="bi bi-twitter-x"></i> Twitter
+                    </label>
+                    <input type="url" id="twitter" name="twitter_url" class="form-control" value="{{ user.artist_profile.twitter_url|default:'' }}" placeholder="https://twitter.com/username">
+                </div>
+
+                <div class="social-link">
+                    <label for="youtube">
+                        <i class="bi bi-youtube"></i> YouTube
+                    </label>
+                    <input type="url" id="youtube" name="youtube_url" class="form-control" value="{{ user.artist_profile.youtube_url|default:'' }}" placeholder="https://youtube.com/c/username">
+                </div>
+
+                <div class="social-link">
+                    <label for="spotify">
+                        <i class="bi bi-spotify"></i> Spotify
+                    </label>
+                    <input type="url" id="spotify" name="spotify_url" class="form-control" value="{{ user.artist_profile.spotify_url|default:'' }}" placeholder="https://open.spotify.com/artist/...">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Preferences -->
+        <div class="form-section">
+            <h2 class="form-section-title"><i class="bi bi-gear"></i> Preferences</h2>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="newsletter" {% if user.newsletter_subscription %}checked{% endif %}>
+                    Subscribe to newsletter for updates and recommendations
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="notifications" {% if user.notifications_enabled %}checked{% endif %}>
+                    Enable email notifications for bookings and events
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="private_profile" {% if user.private_profile %}checked{% endif %}>
+                    Make profile private (only visible to friends)
+                </label>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn-action primary">
+                <i class="bi bi-check-circle"></i> Save Changes
+            </button>
+            <a href="{% url 'accounts:profile' %}" class="btn-action secondary">
+                <i class="bi bi-x-circle"></i> Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- Danger Zone -->
+    <div class="profile-form-container" style="margin-top: 50px;">
+        <h2 class="form-section-title" style="color: #e74c3c;"><i class="bi bi-exclamation-triangle"></i> Danger Zone</h2>
+        
+        <p style="color: #6c757d; margin-bottom: 20px;">These actions are permanent and cannot be undone.</p>
+
+        <div style="display: grid; gap: 15px;">
+            <a href="{% url 'account_change_password' %}" class="btn-action secondary" style="text-align: center; text-decoration: none;">
+                <i class="bi bi-lock"></i> Change Password
+            </a>
+            <button type="button" class="btn-action secondary" onclick="deleteAccount()" style="color: #e74c3c; border-color: #e74c3c;">
+                <i class="bi bi-trash"></i> Delete Account
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Avatar preview
+    document.getElementById('profilePicture').addEventListener('change', function(e) {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const avatarDisplay = document.getElementById('avatarDisplay');
+                avatarDisplay.innerHTML = `<img src="${event.target.result}" alt="Profile Preview">`;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Form validation
+    document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+        const firstName = document.getElementById('firstName').value.trim();
+        const lastName = document.getElementById('lastName').value.trim();
+        
+        if (!firstName || !lastName) {
+            e.preventDefault();
+            alert('First name and last name are required');
+            return;
+        }
+    });
+
+    // Delete account
+    function deleteAccount() {
+        const confirmed = confirm('Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently deleted.');
+        
+        if (confirmed) {
+            const secondConfirm = prompt('Type your email address to confirm account deletion:');
+            if (secondConfirm === '{{ user.email }}') {
+                // Submit deletion request
+                fetch('{% url "accounts:delete_account" %}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Your account has been deleted. Redirecting...');
+                        window.location.href = '{% url "core:home" %}';
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                });
+            } else {
+                alert('Confirmation email did not match');
+            }
+        }
+    }
+</script>
+{% endblock %}

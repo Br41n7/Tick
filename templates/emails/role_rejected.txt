@@ -1,0 +1,10 @@
+Hi {{ user.get_full_name }},
+
+We're sorry — your role upgrade request ({{ request_obj.get_request_type_display }}) was rejected.
+
+Reason: {{ notes|default:'Not specified.' }}
+
+If you have questions, contact support.
+
+Thanks,
+Tick Entertainment Team

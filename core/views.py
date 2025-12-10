@@ -13,7 +13,7 @@ def home(request):
     featured_events = Event.objects.filter(
         status='published',
         is_featured=True,
-        is_upcoming=True
+   #     is_upcoming=True
     ).order_by('-start_date')[:6]
     
     featured_artists = ArtistProfile.objects.filter(
@@ -119,31 +119,16 @@ def search(request):
 
 @login_required
 def dashboard(request):
-    """User dashboard"""
+    """User dashboard - redirects based on user role"""
     user = request.user
     
-    # Get user's recent activities
-    recent_bookings = user.bookings.all().order_by('-booked_at')[:5]
-    favorite_events = user.favorite_events.all().order_by('-created_at')[:5]
-    following_artists = user.following_artists.all().order_by('-created_at')[:5]
-    
-    # If user is host, get their events
-    user_events = []
-    if user.can_create_events():
-        user_events = user.hosted_events.filter(status__in=['published', 'draft']).order_by('-created_at')[:5]
-    
-    # If user is artist, get their reels
-    user_reels = []
-    if user.can_upload_reels():
-        artist_profile = getattr(user, 'artist_profile', None)
-        if artist_profile:
-            user_reels = artist_profile.reels.filter(status='published').order_by('-created_at')[:5]
-    
-    context = {
-        'recent_bookings': recent_bookings,
-        'favorite_events': favorite_events,
-        'following_artists': following_artists,
-        'user_events': user_events,
-        'user_reels': user_reels,
-    }
-    return render(request, 'core/dashboard.html', context)
+    if user.is_superuser:
+        return redirect('accounts:admin_dashboard')
+    elif user.is_host:
+        return redirect('accounts:host_dashboard')
+    elif user.is_artist:
+        return redirect('accounts:artist_dashboard')
+    else:
+        # Regular user dashboard
+        from accounts.views import user_dashboard
+        return user_dashboard(request)

@@ -1,0 +1,12 @@
+<!doctype html>
+<html>
+  <body>
+    <p>Hi {{ user.get_full_name }},</p>
+    <p>We're sorry — the identity document you submitted for role upgrade (<strong>{{ request_obj.get_request_type_display }}</strong>) was <strong>rejected</strong> by our verification team.</p>
+    {% if notes %}
+    <p><strong>Reason:</strong> {{ notes }}</p>
+    {% endif %}
+    <p>Please resubmit corrected documents via your account.</p>
+    <p>Thanks,<br/>Tick Entertainment Team</p>
+  </body>
+</html>

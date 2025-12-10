@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 1rem;
+  }
+  
+  .auth-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 450px;
+    width: 100%;
+    padding: 3rem 2rem;
+    animation: slideUp 0.5s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .auth-header h1 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .auth-header p {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #333;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: var(--brand-start);
+    box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: var(--brand-start);
+  }
+
+  .form-check-label {
+    cursor: pointer;
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+  }
+
+  .btn-login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+  }
+
+  .divider {
+    text-align: center;
+    margin: 2rem 0;
+    color: #999;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    display: inline-block;
+    width: 45%;
+    height: 1px;
+    background: #ddd;
+    vertical-align: middle;
+  }
+
+  .divider::before {
+    margin-right: 0.5rem;
+  }
+
+  .divider::after {
+    margin-left: 0.5rem;
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+
+  .auth-footer p {
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+
+  .auth-footer a {
+    color: var(--brand-start);
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+
+  .auth-footer a:hover {
+    color: #ff5252;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+  }
+
+  .alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+  }
+
+  .forgot-password {
+    text-align: right;
+    margin-top: -0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .forgot-password a {
+    color: var(--brand-start);
+    font-size: 0.85rem;
+    text-decoration: none;
+  }
+
+  .forgot-password a:hover {
+    text-decoration: underline;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h1>Welcome Back</h1>
+      <p>Log in to access your Tick Entertainment account</p>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% else %}error{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}" class="form-label">
+          <i class="bi bi-envelope"></i> Email Address
+        </label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <small class="text-danger">{{ form.email.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.password.id_for_label }}" class="form-label">
+          <i class="bi bi-lock"></i> Password
+        </label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <small class="text-danger">{{ form.password.errors.0 }}</small>
+        {% endif %}
+      </div>
+
+      <div class="form-group checkbox-group">
+        {{ form.remember_me }}
+        <label for="{{ form.remember_me.id_for_label }}" class="form-check-label">
+          Keep me logged in
+        </label>
+      </div>
+
+      <button type="submit" class="btn-login">
+        <i class="bi bi-box-arrow-in-right"></i> Login
+      </button>
+    </form>
+
+    <div class="divider">OR</div>
+
+    <div class="auth-footer">
+      <p>Don't have an account?</p>
+      <a href="{% url 'accounts:signup' %}">Create a new account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

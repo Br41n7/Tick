@@ -3,9 +3,10 @@ from . import views
 
 app_name = 'events'
 
-urlpatterns = [
+urlpatterns = [ path('create/', views.create_event, name='create_event'),
     # Event listing and filtering
     path('', views.event_list, name='event_list'),
+    
     path('category/<slug:category_slug>/', views.event_list_by_category, name='event_list_by_category'),
     path('upcoming/', views.upcoming_events, name='upcoming_events'),
     path('past/', views.past_events, name='past_events'),
@@ -19,7 +20,8 @@ urlpatterns = [
     path('<slug:slug>/share/', views.share_event, name='share_event'),
     
     # Host event management
-    path('create/', views.create_event, name='create_event'),
+    path('<int:event_id>/', views.event_detail, name='event-detail'),
+   
     path('my-events/', views.my_events, name='my_events'),
     path('edit/<int:pk>/', views.edit_event, name='edit_event'),
     path('delete/<int:pk>/', views.delete_event, name='delete_event'),

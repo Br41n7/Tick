@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Us - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .about-hero {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+        margin-bottom: 50px;
+    }
+
+    .about-hero h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .about-content {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .content-section {
+        margin-bottom: 50px;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .section-text {
+        color: #495057;
+        line-height: 1.8;
+        font-size: 1.05rem;
+        margin-bottom: 20px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 30px;
+        margin: 40px 0;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #ff6b6b;
+        margin-bottom: 10px;
+    }
+
+    .stat-label {
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    .team-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        text-align: center;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .team-avatar {
+        height: 180px;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 3rem;
+    }
+
+    .team-info {
+        padding: 20px;
+    }
+
+    .team-name {
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 5px;
+    }
+
+    .team-role {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+    }
+
+    .value-card {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        border-left: 4px solid #ff6b6b;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .value-icon {
+        font-size: 2rem;
+        color: #ff6b6b;
+        margin-bottom: 15px;
+    }
+
+    .value-title {
+        font-weight: 700;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .value-text {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+        .about-hero h1 {
+            font-size: 1.8rem;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="about-hero">
+    <div class="container">
+        <h1>About Tick Entertainment</h1>
+        <p style="font-size: 1.1rem; opacity: 0.95;">Building the future of event discovery and artist showcasing</p>
+    </div>
+</div>
+
+<div class="container about-content">
+    <!-- Our Story -->
+    <div class="content-section">
+        <h2 class="section-title">Our Story</h2>
+        <p class="section-text">
+            Tick Entertainment was founded with a simple mission: to connect people with unforgettable experiences through events, artists, and entertainment. We believe that every moment of entertainment deserves to be special, and we're here to make discovering and booking those moments seamless.
+        </p>
+        <p class="section-text">
+            Starting from humble beginnings, we've grown into a comprehensive platform serving thousands of users across the entertainment industry. Today, we continue to innovate and improve our platform to deliver the best experience for both event seekers and organizers.
+        </p>
+    </div>
+
+    <!-- Statistics -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-number">10K+</div>
+            <div class="stat-label">Events Hosted</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">50K+</div>
+            <div class="stat-label">Active Users</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Featured Artists</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">100K+</div>
+            <div class="stat-label">Bookings Completed</div>
+        </div>
+    </div>
+
+    <!-- Our Mission -->
+    <div class="content-section">
+        <h2 class="section-title">Our Mission</h2>
+        <p class="section-text">
+            We're on a mission to revolutionize how people discover, book, and experience events. By leveraging technology and innovation, we empower event organizers to reach wider audiences and enable fans to find their next favorite experience effortlessly.
+        </p>
+    </div>
+
+    <!-- Our Values -->
+    <div class="content-section">
+        <h2 class="section-title">Our Core Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon"><i class="bi bi-heart-fill"></i></div>
+                <div class="value-title">Passion</div>
+                <div class="value-text">We're passionate about entertainment and dedicated to creating exceptional experiences for our users.</div>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="bi bi-shield-fill"></i></div>
+                <div class="value-title">Trust & Security</div>
+                <div class="value-text">Your safety and security are paramount. We maintain the highest standards to protect your information.</div>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="bi bi-lightbulb-fill"></i></div>
+                <div class="value-title">Innovation</div>
+                <div class="value-text">We constantly innovate and improve our platform to serve you better and stay ahead of trends.</div>
+            </div>
+            <div class="value-card">
+                <div class="value-icon"><i class="bi bi-people-fill"></i></div>
+                <div class="value-title">Community</div>
+                <div class="value-text">We build and nurture a vibrant community of event lovers and entertainment professionals.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Why Choose Us -->
+    <div class="content-section">
+        <h2 class="section-title">Why Choose Tick?</h2>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <p class="section-text"><strong><i class="bi bi-check-circle" style="color:#ff6b6b"></i> Largest Event Catalog</strong><br>
+                Access thousands of events, from concerts to conferences, all in one place.</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <p class="section-text"><strong><i class="bi bi-check-circle" style="color:#ff6b6b"></i> Artist Discovery</strong><br>
+                Follow your favorite artists and never miss their latest performances or content.</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <p class="section-text"><strong><i class="bi bi-check-circle" style="color:#ff6b6b"></i> Seamless Booking</strong><br>
+                Simple, secure, and instant booking with digital tickets delivered straight to your phone.</p>
+            </div>
+            <div class="col-md-6 mb-3">
+                <p class="section-text"><strong><i class="bi bi-check-circle" style="color:#ff6b6b"></i> 24/7 Support</strong><br>
+                Our dedicated support team is always available to help you with any questions or issues.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="content-section">
+        <h2 class="section-title">Meet the Team</h2>
+        <div class="team-grid">
+            <div class="team-card">
+                <div class="team-avatar">CEO</div>
+                <div class="team-info">
+                    <div class="team-name">John Adeleke</div>
+                    <div class="team-role">Chief Executive Officer</div>
+                    <p style="font-size:0.9rem; color:#6c757d">Visionary leader driving innovation in entertainment tech</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">CTO</div>
+                <div class="team-info">
+                    <div class="team-name">Sarah Williams</div>
+                    <div class="team-role">Chief Technology Officer</div>
+                    <p style="font-size:0.9rem; color:#6c757d">Building scalable platforms for millions of users</p>
+                </div>
+            </div>
+            <div class="team-card">
+                <div class="team-avatar">CFO</div>
+                <div class="team-info">
+                    <div class="team-name">Michael Chen</div>
+                    <div class="team-role">Chief Financial Officer</div>
+                    <p style="font-size:0.9rem; color:#6c757d">Ensuring sustainable growth and financial excellence</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact CTA -->
+    <div style="background: linear-gradient(135deg, #ff6b6b, #4ecdc4); color: white; padding: 40px; border-radius: 12px; text-align: center; margin-bottom: 50px;">
+        <h3 style="margin-bottom: 15px;">Have Questions?</h3>
+        <p style="margin-bottom: 20px;">Get in touch with our team. We'd love to hear from you.</p>
+        <a href="{% url 'core:contact' %}" class="btn btn-light">Contact Us</a>
+    </div>
+</div>
+
+{% endblock %}

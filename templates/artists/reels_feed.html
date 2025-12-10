@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reels - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: #000;
+    }
+
+    .reels-container {
+        height: 100vh;
+        overflow-y: scroll;
+        scroll-snap-type: y mandatory;
+        background: #000;
+    }
+
+    .reels-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .reels-container::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    .reels-container::-webkit-scrollbar-thumb {
+        background: #ff6b6b;
+        border-radius: 4px;
+    }
+
+    .reel-item {
+        height: 100vh;
+        scroll-snap-align: start;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        background: #000;
+    }
+
+    .reel-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .reel-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 4rem;
+    }
+
+    .reel-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+        padding: 40px 20px 20px;
+        color: white;
+        z-index: 10;
+    }
+
+    .reel-info {
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .reel-artist-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        cursor: pointer;
+        border: 2px solid white;
+        transition: transform 0.2s;
+    }
+
+    .reel-artist-avatar:hover {
+        transform: scale(1.1);
+    }
+
+    .reel-artist-info {
+        flex: 1;
+    }
+
+    .reel-artist-name {
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 3px;
+    }
+
+    .reel-artist-genre {
+        font-size: 0.85rem;
+        opacity: 0.8;
+    }
+
+    .reel-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .reel-description {
+        font-size: 0.95rem;
+        opacity: 0.9;
+        line-height: 1.5;
+        margin-bottom: 15px;
+    }
+
+    .reel-hashtags {
+        font-size: 0.9rem;
+        color: #4ecdc4;
+        word-break: break-all;
+    }
+
+    .reel-actions {
+        position: absolute;
+        right: 20px;
+        bottom: 120px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        z-index: 10;
+    }
+
+    .action-btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        transition: all 0.2s;
+        backdrop-filter: blur(4px);
+    }
+
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: scale(1.1);
+    }
+
+    .action-btn.liked {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .action-count {
+        font-size: 0.75rem;
+        text-align: center;
+        margin-top: 5px;
+        opacity: 0.9;
+    }
+
+    .action-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .reel-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .play-pause-btn {
+        background: rgba(255, 255, 255, 0.3);
+        border: none;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .play-pause-btn:hover {
+        background: rgba(255, 255, 255, 0.5);
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+        cursor: pointer;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: #ff6b6b;
+        border-radius: 2px;
+        width: 0%;
+    }
+
+    .duration {
+        color: white;
+        font-size: 0.8rem;
+        opacity: 0.8;
+        min-width: 40px;
+        text-align: right;
+    }
+
+    .header-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        z-index: 1000;
+        backdrop-filter: blur(10px);
+    }
+
+    .header-title {
+        color: white;
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .header-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: color 0.2s;
+    }
+
+    .header-btn:hover {
+        color: #ff6b6b;
+    }
+
+    .reel-item.inactive {
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .reel-actions {
+            right: 10px;
+            bottom: 100px;
+            gap: 15px;
+        }
+
+        .action-btn {
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+        }
+
+        .reel-overlay {
+            padding: 30px 15px 15px;
+        }
+
+        .reel-title {
+            font-size: 1.1rem;
+        }
+
+        .reel-description {
+            font-size: 0.9rem;
+        }
+
+        .header-bar {
+            height: 50px;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header-bar">
+    <div class="header-title">
+        <i class="bi bi-film"></i> Reels
+    </div>
+    <div class="header-actions">
+        <button class="header-btn" title="Search">
+            <i class="bi bi-search"></i>
+        </button>
+        <button class="header-btn" title="Notifications">
+            <i class="bi bi-bell"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Reels Container -->
+<div class="reels-container" id="reelsContainer">
+    {% if popular_reels %}
+        {% for reel in popular_reels %}
+        <div class="reel-item" id="reel-{{ reel.id }}" data-reel-id="{{ reel.id }}">
+            <!-- Reel Video/Placeholder -->
+            <div class="reel-placeholder">
+                {% if reel.thumbnail %}
+                    <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" class="reel-video">
+                {% else %}
+                    <i class="bi bi-play-circle"></i>
+                {% endif %}
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="reel-actions">
+                <div class="action-item">
+                    <button class="action-btn like-btn" data-reel-id="{{ reel.id }}" title="Like">
+                        <i class="bi bi-heart"></i>
+                    </button>
+                    <div class="action-count like-count">{{ reel.like_count }}</div>
+                </div>
+                <div class="action-item">
+                    <button class="action-btn" onclick="shareReel({{ reel.id }})" title="Share">
+                        <i class="bi bi-share"></i>
+                    </button>
+                    <div class="action-count">{{ reel.share_count|default:0 }}</div>
+                </div>
+                <div class="action-item">
+                    <button class="action-btn" onclick="goToArtist('{{ reel.artist.slug }}')" title="Visit Artist">
+                        <i class="bi bi-person-fill"></i>
+                    </button>
+                </div>
+                <div class="action-item">
+                    <button class="action-btn" title="More">
+                        <i class="bi bi-three-dots-vertical"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Overlay Content -->
+            <div class="reel-overlay">
+                <div class="reel-info">
+                    <div class="reel-artist-avatar" onclick="goToArtist('{{ reel.artist.slug }}')">
+                        {{ reel.artist.stage_name|first|upper }}
+                    </div>
+                    <div class="reel-artist-info">
+                        <div class="reel-artist-name">{{ reel.artist.stage_name }}</div>
+                        <div class="reel-artist-genre">
+                            {% if reel.artist.is_verified %}<i class="bi bi-check-circle-fill"></i>{% endif %}
+                            {{ reel.artist.genre }}
+                        </div>
+                    </div>
+                    <button class="btn btn-sm" style="background: #ff6b6b; color: white; border: none;" onclick="followArtist({{ reel.artist.id }})">
+                        Follow
+                    </button>
+                </div>
+
+                <div class="reel-title">{{ reel.title }}</div>
+                <div class="reel-description">{{ reel.description|truncatewords:20 }}</div>
+                
+                {% if reel.description|length > 100 %}
+                <div class="reel-hashtags">#entertainment #artist #reels</div>
+                {% endif %}
+
+                <!-- Video Controls -->
+                <div class="reel-controls">
+                    <button class="play-pause-btn" onclick="togglePlay(this)">
+                        <i class="bi bi-play-fill"></i>
+                    </button>
+                    <div class="progress-bar" onclick="seekVideo(event)">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="duration">
+                        {% if reel.duration %}
+                            {% widthratio reel.duration 60 1 %}:{% widthratio reel.duration 1 60 %}
+                        {% else %}
+                            0:30
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="reel-item" style="flex-direction: column; justify-content: center;">
+            <div style="text-align: center; color: #999;">
+                <i class="bi bi-inbox" style="font-size: 4rem; margin-bottom: 20px; display: block;"></i>
+                <h2 style="color: white;">No reels available</h2>
+                <p>Check back later for amazing content from your favorite artists</p>
+                <a href="{% url 'artists:artist_list' %}" class="btn btn-primary mt-3">
+                    Discover Artists
+                </a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Infinite scroll simulation
+    let currentReelIndex = 0;
+    const reelItems = document.querySelectorAll('.reel-item');
+
+    document.getElementById('reelsContainer').addEventListener('scroll', function() {
+        const container = this;
+        const scrollTop = container.scrollTop;
+        const itemHeight = window.innerHeight;
+        const currentIndex = Math.round(scrollTop / itemHeight);
+
+        // Update active state
+        reelItems.forEach((item, index) => {
+            if (index === currentIndex) {
+                item.classList.remove('inactive');
+            } else {
+                item.classList.add('inactive');
+            }
+        });
+    });
+
+    // Like button functionality
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.classList.toggle('liked');
+            const reelId = this.getAttribute('data-reel-id');
+            const likeCount = this.parentElement.querySelector('.like-count');
+            let count = parseInt(likeCount.textContent);
+            
+            if (this.classList.contains('liked')) {
+                count++;
+            } else {
+                count--;
+            }
+            likeCount.textContent = count;
+            
+            // Send AJAX request
+            fetch(`/ajax/like/${reelId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                }
+            });
+        });
+    });
+
+    function shareReel(reelId) {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Check out this reel!',
+                url: window.location.origin + '/reel/' + reelId + '/'
+            });
+        } else {
+            alert('Share URL: ' + window.location.origin + '/reel/' + reelId + '/');
+        }
+    }
+
+    function goToArtist(artistSlug) {
+        window.location.href = '/artists/' + artistSlug + '/';
+    }
+
+    function followArtist(artistId) {
+        fetch(`/ajax/follow/${artistId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            }
+        }).then(response => response.json())
+        .then(data => {
+            alert(data.message || 'Followed!');
+        });
+    }
+
+    function togglePlay(btn) {
+        const icon = btn.querySelector('i');
+        if (icon.classList.contains('bi-play-fill')) {
+            icon.classList.remove('bi-play-fill');
+            icon.classList.add('bi-pause-fill');
+        } else {
+            icon.classList.remove('bi-pause-fill');
+            icon.classList.add('bi-play-fill');
+        }
+    }
+
+    function seekVideo(event) {
+        // Seek functionality
+        const bar = event.currentTarget;
+        const rect = bar.getBoundingClientRect();
+        const percentage = (event.clientX - rect.left) / rect.width;
+        bar.querySelector('.progress-fill').style.width = (percentage * 100) + '%';
+    }
+</script>
+{% endblock %}

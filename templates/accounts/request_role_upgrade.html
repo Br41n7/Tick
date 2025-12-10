@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Role Upgrade{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+  <div class="col-md-8">
+    <div class="card card-themed">
+      <div class="card-body p-4">
+        <h4>Request Role Upgrade</h4>
+        <p class="text-muted">Please provide the required details and upload a government ID for verification.</p>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+
+          <div class="mb-3">
+            <label class="form-label">Upgrade Type</label>
+            {{ form.request_type|as_widget }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Reason</label>
+            {{ form.reason|as_widget }}
+          </div>
+
+          <hr>
+          <h6>KYC Information</h6>
+
+          <div class="mb-3">
+            <label class="form-label">ID Type</label>
+            {{ form.kyc_id_type|as_widget }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">ID Number</label>
+            {{ form.kyc_id_number|as_widget }}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Upload ID Document</label>
+            {{ form.kyc_document|as_widget }}
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary site-hero-gradient text-white" type="submit">Submit Request</button>
+            <a href="{% url 'accounts:dashboard' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

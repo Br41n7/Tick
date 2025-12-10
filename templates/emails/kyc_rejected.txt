@@ -1,0 +1,10 @@
+Hi {{ user.get_full_name }},
+
+We're sorry — the identity document you submitted for role upgrade ({{ request_obj.get_request_type_display }}) was rejected by our verification team.
+
+Reason: {{ notes|default:'Not specified.' }}
+
+Please resubmit corrected documents via your account.
+
+Thanks,
+Tick Entertainment Team

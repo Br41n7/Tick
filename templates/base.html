@@ -14,7 +14,6 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     
     {% block extra_css %}{% endblock %}
-<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
 </head>
 <body>
     <!-- Navigation -->
@@ -36,9 +35,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events:event_list' %}">Events</a>
                     </li>
-                    <li class="nav-item">
+                    {% comment %}
+                         <li class="nav-item">
                         <a class="nav-link" href="{% url 'artists:artist_list' %}">Artists</a>
                     </li>
+                    {% endcomment %}
+                   
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:about' %}">About</a>
                     </li>
@@ -63,15 +65,13 @@
                                 <i class="bi bi-person-circle"></i> {{ user.get_display_role }}
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="{% url 'core:dashboard' %}">
+                                <li><a class="dropdown-item" href="{% url 'accounts:user_dashboard' %}">
                                     <i class="bi bi-speedometer2"></i> Dashboard
                                 </a></li>
-                                <li><a class="dropdown-item" href="{% url 'account_email' %}">
-                                    <i class="bi bi-envelope"></i> Email Settings
+                                <li><a class="dropdown-item" href="{% url 'accounts:edit_profile' %}">
+                                    <i class="bi bi-envelope"></i> Profile Settings
                                 </a></li>
-                                <li><a class="dropdown-item" href="{% url 'account_change_password' %}">
-                                    <i class="bi bi-key"></i> Change Password
-                                </a></li>
+
                                 {% if user.can_create_events %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'events:my_events' %}">
@@ -91,22 +91,25 @@
                                 {% endif %}
                                 {% if user.role == 'ordinary_user' %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" onclick="showUpgradeModal()">
+                                <li><a class="dropdown-item" href="{% url 'accounts:upgrade_role' %}">
                                     <i class="bi bi-arrow-up-circle"></i> Upgrade Role
                                 </a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'account_logout' %}">
+                                <li><a class="dropdown-item text-danger" href="{% url 'accounts:delete_account' %}">
+                                    <i class="bi bi-trash3"></i> Delete Account
+                                </a></li>
+                                <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
                                     <i class="bi bi-box-arrow-right"></i> Logout
                                 </a></li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'account_login' %}">Login</a>
+                            <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary text-white ms-2" href="{% url 'account_signup' %}">Sign Up</a>
+                            <a class="nav-link btn btn-primary text-white ms-2" href="{% url 'accounts:signup' %}">Sign Up</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -159,7 +162,7 @@
             </div>
             <hr class="border-secondary">
             <div class="text-center">
-                <p class="mb-0">&copy; 2024 Tick Entertainment. All rights reserved.</p>
+                <p class="mb-0">&copy; 2025 Tick Entertainment. All rights reserved.</p>
             </div>
         </div>
     </footer>

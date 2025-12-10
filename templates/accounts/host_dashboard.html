@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Host Dashboard - Tick Entertainment{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 40px;
+        border-radius: 0 0 15px 15px;
+    }
+
+    .dashboard-container {
+        min-height: 70vh;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #ff6b6b;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .stat-card .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #ff6b6b;
+        margin: 10px 0;
+    }
+
+    .stat-card .stat-label {
+        color: #6c757d;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        color: #ff6b6b;
+        margin-bottom: 10px;
+    }
+
+    .revenue-card {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #00b894;
+        transition: all 0.3s ease;
+    }
+
+    .revenue-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .revenue-card .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #00b894;
+        margin: 10px 0;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin: 40px 0 25px 0;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #ff6b6b;
+    }
+
+    .event-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+    }
+
+    .event-content {
+        padding: 20px;
+    }
+
+    .event-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #2d3436;
+        margin-bottom: 10px;
+    }
+
+    .event-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
+
+    .event-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .event-meta-item i {
+        color: #ff6b6b;
+        width: 20px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
+
+    .status-published {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-draft {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+
+    .quick-action-btn {
+        padding: 20px;
+        border-radius: 10px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        text-decoration: none;
+        color: white;
+    }
+
+    .quick-action-btn i {
+        font-size: 1.5rem;
+    }
+
+    .quick-action-btn.primary {
+        background: linear-gradient(135deg, #ff6b6b, #ff5252);
+    }
+
+    .quick-action-btn.primary:hover {
+        background: linear-gradient(135deg, #ff5252, #ff3333);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+    }
+
+    .quick-action-btn.secondary {
+        background: linear-gradient(135deg, #4ecdc4, #45b5b0);
+    }
+
+    .quick-action-btn.secondary:hover {
+        background: linear-gradient(135deg, #45b5b0, #3ca89c);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(78, 205, 196, 0.4);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        color: #dee2e6;
+        margin-bottom: 20px;
+    }
+
+    .divider {
+        height: 2px;
+        background: linear-gradient(90deg, #ff6b6b, transparent);
+        margin: 30px 0;
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-header {
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            margin: 30px 0 20px 0;
+        }
+
+        .quick-actions {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Header -->
+<div class="dashboard-header">
+    <div class="container">
+        <h1 class="mb-2"><i class="bi bi-calendar-event"></i> Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p class="mb-0">Manage your events, bookings, and event performance</p>
+    </div>
+</div>
+
+<div class="container dashboard-container">
+    <!-- Quick Stats -->
+    <div class="row mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-calendar-event"></i></div>
+                <div class="stat-label">Total Events</div>
+                <div class="stat-number">{{ total_events }}</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-check-circle"></i></div>
+                <div class="stat-label">Published</div>
+                <div class="stat-number">{{ published_events }}</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-ticket"></i></div>
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-number">{{ total_bookings }}</div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div class="stat-icon"><i class="bi bi-check-all"></i></div>
+                <div class="stat-label">Confirmed</div>
+                <div class="stat-number">{{ confirmed_bookings }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revenue Card -->
+    <div class="row mb-5">
+        <div class="col-md-6">
+            <div class="revenue-card">
+                <div class="stat-icon"><i class="bi bi-wallet2"></i></div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-number">₦{{ total_revenue|floatformat:0 }}</div>
+                <small class="text-muted">From confirmed bookings</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-title">Quick Actions</div>
+    <div class="quick-actions">
+        <a href="{% url 'events:create_event' %}" class="quick-action-btn primary">
+            <i class="bi bi-plus-circle"></i>
+            <span>Create Event</span>
+        </a>
+        <a href="{% url 'accounts:my_events' %}" class="quick-action-btn secondary">
+            <i class="bi bi-calendar-event"></i>
+            <span>My Events</span>
+        </a>
+        <a href="{% url 'accounts:edit_profile' %}" class="quick-action-btn primary">
+            <i class="bi bi-pencil"></i>
+            <span>Edit Profile</span>
+        </a>
+        <a href="{% url 'account_email' %}" class="quick-action-btn secondary">
+            <i class="bi bi-gear"></i>
+            <span>Settings</span>
+        </a>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Recent Events Section -->
+    <div class="section-title"><i class="bi bi-calendar-event"></i> Recent Events</div>
+    {% if events %}
+        <div class="row mb-5">
+            {% for event in events %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="event-card">
+                    {% if event.image %}
+                        <img src="{{ event.image.url }}" alt="{{ event.title }}" class="event-image">
+                    {% else %}
+                        <div class="event-image"></div>
+                    {% endif %}
+                    <div class="event-content">
+                        <span class="status-badge status-{{ event.status }}">{{ event.get_status_display }}</span>
+                        
+                        <h5 class="event-title">{{ event.title }}</h5>
+                        
+                        <div class="event-meta">
+                            <div class="event-meta-item">
+                                <i class="bi bi-calendar3"></i>
+                                <span>{{ event.start_date|date:"M d, Y H:i" }}</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="bi bi-geo-alt"></i>
+                                <span>{{ event.venue_name }}</span>
+                            </div>
+                            <div class="event-meta-item">
+                                <i class="bi bi-ticket"></i>
+                                <span>
+                                    {% if event.is_free %}
+                                        FREE
+                                    {% else %}
+                                        ₦{{ event.ticket_price }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+
+                        <p class="text-muted small mb-3">{{ event.short_description|truncatewords:15 }}</p>
+                        
+                        <a href="{% url 'events:event_detail' event.id %}" class="btn btn-sm btn-primary w-100 mb-2">
+                            <i class="bi bi-eye"></i> View Event
+                        </a>
+                        <a href="#" class="btn btn-sm btn-outline-primary w-100">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="mb-5">
+            <a href="{% url 'accounts:my_events' %}" class="btn btn-outline-primary btn-lg w-100">
+                <i class="bi bi-arrow-right"></i> View All Events ({{ total_events }} total)
+            </a>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i class="bi bi-calendar-event"></i></div>
+            <p style="font-size: 1.2rem; margin-bottom: 20px;">No events yet</p>
+            <p class="text-muted">Create your first event to start accepting bookings</p>
+            <a href="{% url 'events:create_event' %}" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle"></i> Create Your First Event
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
