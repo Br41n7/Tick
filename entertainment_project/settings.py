@@ -43,6 +43,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'crispy_forms',
     'crispy_bootstrap5',
+ #   'djangorestframework',
+    'rest_framework',
+    'drf_spectacular',
     
     # Local apps
     'accounts.apps.AccountsConfig',
@@ -136,6 +139,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+# Django REST Framework / API schema
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Tick Entertainment API',
+    'DESCRIPTION': 'API for Tick Entertainment platform (events, bookings, users)',
+    'VERSION': '1.0.0',
+}
 
 # Django-allauth settings
 SITE_ID = 1

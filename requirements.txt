@@ -23,3 +23,6 @@ python-slugify
 
 # Development
 django-debug-toolbar
+# API
+djangorestframework
+drf-spectacular
