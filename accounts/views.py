@@ -222,16 +222,25 @@ def artist_dashboard(request):
         messages.error(request, 'You do not have permission to access artist dashboard!')
         return redirect('accounts:dashboard')
     
-    artist_profile = getattr(request.user, 'artist_profile', None)
+    try:
+        artist_profile = request.user.artist_profile
+    except ArtistProfile.DoesNotExist:
+        artist_profile = None
+
+    # If the user is allowed to upload reels but hasn't created an ArtistProfile yet,
+    # redirect them to the artist profile setup page so they can complete their profile.
+    if not artist_profile:
+        messages.info(request, 'Please create your artist profile to access the artist dashboard.')
+        return redirect('artists:edit_artist_profile')
     
-    # Get artist's reels
-    reels = artist_profile.reels.all().order_by('-created_at') if artist_profile else []
+    # Get artist's reels (use an empty QuerySet when no profile to keep API consistent)
+    reels = artist_profile.reels.all().order_by('-created_at') if artist_profile else Reel.objects.none()
     total_reels = reels.count()
     published_reels = reels.filter(status='published').count()
-    
+
     # Calculate statistics
-    total_views = sum(reel.view_count for reel in reels) if artist_profile else 0
-    total_likes = sum(reel.like_count for reel in reels) if artist_profile else 0
+    total_views = sum(reel.view_count for reel in reels) if reels else 0
+    total_likes = sum(reel.like_count for reel in reels) if reels else 0
     follower_count = artist_profile.follower_count if artist_profile else 0
     
     context = {
@@ -411,11 +420,16 @@ def upgrade_role(request):
             messages.error(request, 'Invalid role selected.')
             return redirect('accounts:upgrade_role')
         
-        # Create upgrade request
+        # Create upgrade request (model uses `request_type` values 'to_artist' / 'to_host')
         from .models import RoleUpgradeRequest
+        mapping = {
+            'artist': 'to_artist',
+            'host': 'to_host',
+        }
+        request_type = mapping.get(role)
         upgrade_request = RoleUpgradeRequest.objects.create(
             user=request.user,
-            requested_role=role,
+            request_type=request_type,
             reason=request.POST.get('reason', ''),
             status='pending'
         )
@@ -429,6 +443,43 @@ def upgrade_role(request):
     
     context = {}
     return render(request, 'accounts/upgrade_role.html', context)
+
+
+@login_required
+def cancel_upgrade_request(request, pk):
+    """Allow a user to cancel their pending role upgrade request."""
+    if request.method != 'POST':
+        messages.error(request, 'Invalid request method.')
+        return redirect('accounts:my_upgrade_requests')
+
+    req = get_object_or_404(RoleUpgradeRequest, pk=pk, user=request.user)
+    if req.status != 'pending':
+        messages.error(request, 'Only pending requests can be canceled.')
+        return redirect('accounts:my_upgrade_requests')
+
+    # Mark as rejected/canceled by user for audit trail
+    req.status = 'rejected'
+    req.admin_notes = (req.admin_notes or '') + '\nCanceled by user.'
+    req.processed_by = request.user
+    req.save()
+
+    messages.success(request, 'Your upgrade request has been canceled.')
+    return redirect('accounts:my_upgrade_requests')
+
+
+@login_required
+def upgrade_request_detail(request, pk):
+    """Detailed view for a role upgrade request (owner or admin)."""
+    req = get_object_or_404(RoleUpgradeRequest, pk=pk)
+    # Only owner or superuser can view
+    if not (request.user.is_superuser or req.user == request.user):
+        messages.error(request, 'You do not have permission to view this request.')
+        return redirect('accounts:my_upgrade_requests')
+
+    context = {
+        'request_obj': req,
+    }
+    return render(request, 'accounts/upgrade_request_detail.html', context)
 
 @login_required
 def delete_account(request):

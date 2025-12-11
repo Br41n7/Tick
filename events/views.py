@@ -11,6 +11,7 @@ import json
 
 from .models import Event, EventCategory, Booking, EventFavorite, EventShare
 from .forms import EventForm, BookingForm
+import logging
 
 def event_list(request):
     """List all published events with filtering and search"""
@@ -212,7 +213,7 @@ def book_event(request, slug):
         return redirect('events:event_detail', slug=slug)
     
     if request.method == 'POST':
-        form = BookingForm(request.POST)
+        form = BookingForm(request.POST, event=event)
         if form.is_valid():
             quantity = form.cleaned_data['quantity']
             
@@ -236,7 +237,9 @@ def book_event(request, slug):
             return redirect('payments:process_payment', booking_reference=booking.booking_reference)
     
     else:
-        form = BookingForm()
+        # Pre-fill quantity from query param if provided (e.g. from event detail quick book)
+        initial_qty = request.GET.get('qty') or 1
+        form = BookingForm(event=event, initial={'quantity': initial_qty})
     
     context = {
         'event': event,
@@ -445,6 +448,34 @@ def ajax_book_event(request, event_id):
         'payment_url': reverse('payments:process_payment', kwargs={'booking_reference': booking.booking_reference}),
         'message': 'Booking created successfully'
     })
+
+
+# Simple analytics/tracking endpoint (non-blocking client calls)
+@require_POST
+def ajax_track_action(request):
+    """Receive lightweight analytics events from the frontend and log them."""
+    logger = logging.getLogger(__name__)
+    try:
+        # Accept JSON or form-encoded
+        if request.content_type == 'application/json':
+            import json as _json
+            payload = _json.loads(request.body.decode('utf-8'))
+        else:
+            payload = request.POST.dict()
+
+        # Basic fields: event_id, action, quantity, booking_reference, extra
+        event_id = payload.get('event_id')
+        action = payload.get('action')
+        quantity = payload.get('quantity')
+        booking_ref = payload.get('booking_reference')
+
+        logger.info('Analytics event: action=%s event_id=%s qty=%s booking=%s extra=%s',
+                    action, event_id, quantity, booking_ref, {k: v for k, v in payload.items() if k not in ('event_id','action','quantity','booking_reference')})
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        logger.exception('Error processing analytics event: %s', e)
+        return JsonResponse({'success': False}, status=500)
 
 @login_required
 @require_POST

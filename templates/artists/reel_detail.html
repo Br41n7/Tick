@@ -15,8 +15,8 @@
 {% block content %}
 <div class="container mt-4">
     <div class="reel-player">
-        {% if reel.video %}
-            <video src="{{ reel.video.url }}" controls style="width:100%; height:auto"></video>
+        {% if reel.video_file %}
+            <video src="{{ reel.video_file.url }}" controls style="width:100%; height:auto"></video>
         {% else %}
             <div style="padding:80px; text-align:center; color:#fff">No video available</div>
         {% endif %}

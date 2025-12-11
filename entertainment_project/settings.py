@@ -5,6 +5,7 @@ Django settings for entertainment_project.
 from pathlib import Path
 import os
 import environ
+from datetime import timedelta
 # import dj_database_url  # Using SQLite for development
 
 # Build paths inside the project
@@ -147,6 +148,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ],
@@ -156,6 +158,26 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Tick Entertainment API',
     'DESCRIPTION': 'API for Tick Entertainment platform (events, bookings, users)',
     'VERSION': '1.0.0',
+    'SERVERS': [
+        {'url': 'http://localhost:8000', 'description': 'Local development server'},
+    ],
+    'CONTACT': {
+        'name': 'Tick Support',
+        'email': 'support@example.com'
+    },
+    'TAGS': [
+        {'name': 'events', 'description': 'Operations related to events and listings'},
+        {'name': 'bookings', 'description': 'Booking lifecycle and payments'},
+        {'name': 'users', 'description': 'User profiles and role upgrades'},
+    ],
+}
+
+# Simple JWT settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Django-allauth settings

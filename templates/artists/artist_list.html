@@ -390,23 +390,12 @@
 {% block extra_js %}
 <script>
     document.querySelectorAll('.follow-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
             const artistId = this.getAttribute('data-artist-id');
-            fetch(`/ajax/follow/${artistId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
-                }
-            }).then(response => response.json())
-            .then(data => {
-                if (data.followed) {
-                    this.textContent = '✓ Following';
-                    this.classList.add('active');
-                } else {
-                    this.innerHTML = '<i class="bi bi-person-plus"></i> Follow';
-                    this.classList.remove('active');
-                }
-            });
+            if (artistId) {
+                toggleFollow(artistId, this);
+            }
         });
     });
 </script>

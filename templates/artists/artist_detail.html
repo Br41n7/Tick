@@ -470,12 +470,24 @@
             {% if reels %}
                 <div class="reel-grid">
                     {% for reel in reels %}
-                    <div class="reel-card" onclick="window.location.href='/reel/{{ reel.id }}/'">
+                    <div class="reel-card">
                         <div class="reel-thumbnail">
                             {% if reel.thumbnail %}
-                                <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% if reel.video_file %}
+                                <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                                {% else %}
+                                <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                                {% endif %}
+                                    <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </a>
                             {% else %}
-                                <i class="bi bi-play-circle"></i>
+                                {% if reel.video_file %}
+                                <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                                {% else %}
+                                <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                                {% endif %}
+                                    <i class="bi bi-play-circle"></i>
+                                </a>
                             {% endif %}
                         </div>
                         <div class="reel-info">
@@ -523,24 +535,13 @@
         });
     });
 
-    // Follow button
-    document.getElementById('followBtn').addEventListener('click', function() {
+    // Follow button handled by main.js toggleFollow
+    document.getElementById('followBtn').addEventListener('click', function(e) {
+        e.preventDefault();
         const artistId = this.getAttribute('data-artist-id');
-        fetch(`/ajax/follow/${artistId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
-            }
-        }).then(response => response.json())
-        .then(data => {
-            if (data.followed) {
-                this.textContent = '✓ Following';
-                this.classList.add('following');
-            } else {
-                this.innerHTML = '<i class="bi bi-person-plus"></i> Follow';
-                this.classList.remove('following');
-            }
-        });
+        if (artistId) {
+            toggleFollow(artistId, this);
+        }
     });
 </script>
 {% endblock %}

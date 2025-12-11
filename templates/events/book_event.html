@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Tickets - {{ event.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-body">
+          <h3>Book Tickets for {{ event.title }}</h3>
+          <p class="text-muted">{{ event.short_description }}</p>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+
+            <div class="mb-3">
+              <label class="form-label">Quantity</label>
+              {{ form.quantity }}
+              {% if form.quantity.errors %}
+                <div class="text-danger">{{ form.quantity.errors.0 }}</div>
+              {% endif %}
+              {% if form.quantity.help_text %}
+                <div class="form-text">{{ form.quantity.help_text }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Price per ticket</label>
+              <div><strong>{% if event.is_free %}FREE{% else %}₦{{ event.ticket_price }}{% endif %}</strong></div>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+              <a href="{% url 'events:event_detail' slug=event.slug %}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

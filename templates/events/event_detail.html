@@ -575,10 +575,10 @@
 
                 <div class="availability">
                     <div class="availability-bar">
-                        <div class="availability-fill"></div>
+                        <div class="availability-fill" id="availability-fill"></div>
                     </div>
                     <div class="availability-text">
-                        <strong>{{ event.available_seats }}</strong> seats available
+                        <strong id="available-count">{{ event.available_seats }}</strong> seats available
                     </div>
                 </div>
 
@@ -592,8 +592,9 @@
                 </div>
 
                 {% if user.is_authenticated %}
-                    <button class="btn btn-primary btn-book" onclick="bookEvent()">
-                        <i class="bi bi-ticket"></i> Book Now
+                    <button id="btn-book" class="btn btn-primary btn-book" data-ajax-url="{% url 'events:ajax_book_event' event.id %}" data-available="{{ event.available_tickets_count }}">
+                        <span class="spinner-border spinner-border-sm me-2 d-none" role="status" aria-hidden="true" id="btn-spinner"></span>
+                        <span id="btn-text"><i class="bi bi-ticket"></i> Book Now</span>
                     </button>
                     <button class="btn btn-favorite">
                         <i class="bi bi-heart"></i> Add to Favorites
@@ -641,11 +642,144 @@
         input.value = Math.max(parseInt(input.value) - 1, 1);
     }
 
-    function bookEvent() {
-        const qty = document.getElementById('quantity').value;
-        // Redirect to booking page with quantity parameter
-        window.location.href = '/events/{{ event.slug }}/book/?qty=' + qty;
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
     }
+
+    function displayBookingMessage(message, success=true) {
+        // small inline message element
+        let container = document.getElementById('booking-message');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'booking-message';
+            container.style.marginTop = '1rem';
+            document.querySelector('.booking-card')?.appendChild(container);
+        }
+        container.innerHTML = '';
+        const el = document.createElement('div');
+        el.className = success ? 'alert alert-success' : 'alert alert-danger';
+        el.textContent = message;
+        container.appendChild(el);
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('btn-book');
+        const qtyInput = document.getElementById('quantity');
+        if (!btn || !qtyInput) return;
+
+        const ajaxUrl = btn.dataset.ajaxUrl;
+        let available = parseInt(btn.dataset.available || '0', 10);
+        const initialAvailable = available;
+        const analyticsUrl = "{% url 'events:ajax_track_action' %}";
+        const spinner = document.getElementById('btn-spinner');
+        const btnText = document.getElementById('btn-text');
+        const availableCountEl = document.getElementById('available-count');
+        const availabilityFillEl = document.getElementById('availability-fill');
+
+        function validateQty() {
+            const qty = parseInt(qtyInput.value || '1', 10);
+            if (isNaN(qty) || qty < 1) {
+                btn.disabled = true;
+                return false;
+            }
+            if (qty > available) {
+                btn.disabled = true;
+                return false;
+            }
+            btn.disabled = false;
+            return true;
+        }
+
+        // initial validation
+        validateQty();
+
+        qtyInput.addEventListener('input', validateQty);
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (!validateQty()) {
+                displayBookingMessage('Please enter a valid quantity not exceeding available tickets.', false);
+                return;
+            }
+            const qty = parseInt(qtyInput.value || '1', 10);
+            const csrftoken = getCookie('csrftoken');
+
+            // disable button and show spinner
+            btn.disabled = true;
+            if (spinner) spinner.classList.remove('d-none');
+            if (btnText) btnText.classList.add('opacity-50');
+
+            const formData = new FormData();
+            formData.append('quantity', qty);
+
+            fetch(ajaxUrl, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrftoken,
+                },
+                body: formData,
+                credentials: 'same-origin'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // update available seats UI before redirecting
+                    const newAvailable = Math.max(0, available - qty);
+                    available = newAvailable;
+                    if (availableCountEl) availableCountEl.textContent = String(newAvailable);
+                    if (availabilityFillEl && initialAvailable > 0) {
+                        const pct = Math.max(0, (newAvailable / initialAvailable) * 100);
+                        availabilityFillEl.style.width = pct + '%';
+                    }
+
+                    // send lightweight analytics event (fire-and-forget)
+                    try {
+                        const aData = new FormData();
+                        aData.append('action', 'book');
+                        aData.append('event_id', '{{ event.id }}');
+                        aData.append('quantity', qty);
+                        fetch(analyticsUrl, {
+                            method: 'POST',
+                            headers: { 'X-CSRFToken': csrftoken },
+                            body: aData,
+                            credentials: 'same-origin'
+                        }).catch(()=>{});
+                    } catch (err) {
+                        // ignore analytics errors
+                    }
+
+                    // redirect to payment page
+                    window.location.href = data.payment_url;
+                } else {
+                    displayBookingMessage(data.message || 'Booking failed. Please try again.', false);
+                    // restore button
+                    btn.disabled = false;
+                    if (spinner) spinner.classList.add('d-none');
+                    if (btnText) btnText.classList.remove('opacity-50');
+                }
+            })
+            .catch(err => {
+                console.error('Booking error', err);
+                displayBookingMessage('An unexpected error occurred. Please try again later.', false);
+                btn.disabled = false;
+                if (spinner) spinner.classList.add('d-none');
+                if (btnText) btnText.classList.remove('opacity-50');
+            });
+        });
+    });
 
     // Tab switching
     document.querySelectorAll('.event-tab').forEach(tab => {

@@ -337,9 +337,21 @@
             <!-- Reel Video/Placeholder -->
             <div class="reel-placeholder">
                 {% if reel.thumbnail %}
-                    <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" class="reel-video">
+                    {% if reel.video_file %}
+                    <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% else %}
+                    <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% endif %}
+                        <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}" class="reel-video">
+                    </a>
                 {% else %}
-                    <i class="bi bi-play-circle"></i>
+                    {% if reel.video_file %}
+                    <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% else %}
+                    <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% endif %}
+                        <i class="bi bi-play-circle"></i>
+                    </a>
                 {% endif %}
             </div>
 
@@ -382,7 +394,7 @@
                             {{ reel.artist.genre }}
                         </div>
                     </div>
-                    <button class="btn btn-sm" style="background: #ff6b6b; color: white; border: none;" onclick="followArtist({{ reel.artist.id }})">
+                    <button class="btn btn-sm follow-btn" style="background: #ff6b6b; color: white; border: none;" data-artist-id="{{ reel.artist.id }}">
                         Follow
                     </button>
                 </div>
@@ -451,30 +463,7 @@
         });
     });
 
-    // Like button functionality
-    document.querySelectorAll('.like-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            this.classList.toggle('liked');
-            const reelId = this.getAttribute('data-reel-id');
-            const likeCount = this.parentElement.querySelector('.like-count');
-            let count = parseInt(likeCount.textContent);
-            
-            if (this.classList.contains('liked')) {
-                count++;
-            } else {
-                count--;
-            }
-            likeCount.textContent = count;
-            
-            // Send AJAX request
-            fetch(`/ajax/like/${reelId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
-                }
-            });
-        });
-    });
+    // Like button functionality is handled by main.js toggleLike which uses AJAX with CSRF token
 
     function shareReel(reelId) {
         if (navigator.share) {
@@ -491,17 +480,7 @@
         window.location.href = '/artists/' + artistSlug + '/';
     }
 
-    function followArtist(artistId) {
-        fetch(`/ajax/follow/${artistId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
-            }
-        }).then(response => response.json())
-        .then(data => {
-            alert(data.message || 'Followed!');
-        });
-    }
+    // Use main.js toggleFollow() for follow actions
 
     function togglePlay(btn) {
         const icon = btn.querySelector('i');

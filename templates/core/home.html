@@ -257,6 +257,47 @@
     </div>
     {% endif %}
 
+    <!-- Popular Reels -->
+    {% if popular_reels %}
+    <div class="section-title">Popular Reels</div>
+    <div class="items-grid">
+        {% for reel in popular_reels %}
+        <div class="item-card">
+            <div class="item-image reel-thumb" style="position:relative;">
+                {% if reel.thumbnail %}
+                    {% if reel.video_file %}
+                    <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% else %}
+                    <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% endif %}
+                        <img src="{{ reel.thumbnail.url }}" alt="{{ reel.title }}">
+                    </a>
+                {% else %}
+                    {% if reel.video_file %}
+                    <a href="{{ reel.video_file.url }}" class="glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% else %}
+                    <a href="{{ reel.get_absolute_url }}" class="glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">
+                    {% endif %}
+                        <div style="display:flex; align-items:center; justify-content:center; height:100%">
+                            <i class="bi bi-play-circle" style="font-size:48px; color:#fff; opacity:0.8"></i>
+                        </div>
+                    </a>
+                {% endif %}
+            </div>
+            <div class="item-body">
+                <div class="item-title">{{ reel.title }}</div>
+                <div class="item-text">By {{ reel.artist.stage_name }} · {{ reel.view_count }} views</div>
+                {% if reel.video_file %}
+                <a href="{{ reel.video_file.url }}" class="btn btn-sm btn-primary glightbox" data-type="video" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">Watch</a>
+                {% else %}
+                <a href="{{ reel.get_absolute_url }}" class="btn btn-sm btn-primary glightbox" data-title="{{ reel.title }}" data-reel-id="{{ reel.id }}">Watch</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
     <!-- Call to Action -->
     <div class="cta-section">
         <div class="cta-title">Ready to Get Started?</div>

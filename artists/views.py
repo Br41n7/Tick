@@ -398,11 +398,23 @@ def edit_artist_profile(request):
             messages.success(request, 'Artist profile updated successfully!')
             return redirect('artists:artist_dashboard')
     else:
-        form = ArtistProfileForm(instance=artist_profile)
+        # Prefill sensible defaults from the user's account when creating a new profile
+        if not artist_profile.pk:
+            full_name = (request.user.get_full_name() or request.user.username or '')
+            default_stage = full_name.strip() if full_name.strip() else request.user.username
+            initial = {
+                'stage_name': default_stage,
+                'booking_email': request.user.email,
+                'phone_number': getattr(request.user, 'phone_number', '') or ''
+            }
+            form = ArtistProfileForm(instance=artist_profile, initial=initial)
+        else:
+            form = ArtistProfileForm(instance=artist_profile)
     
     context = {
         'form': form,
         'title': 'Edit Artist Profile',
+        'artist_profile': artist_profile,
     }
     return render(request, 'artists/edit_artist_profile.html', context)
 
@@ -521,7 +533,7 @@ def ajax_follow_artist(request, artist_id):
 @require_POST
 def ajax_like_reel(request, reel_id):
     """AJAX endpoint for liking reels"""
-    reel = get_object_or_404(Reel, id=reel, status='published')
+    reel = get_object_or_404(Reel, id=reel_id, status='published')
     
     like, created = ReelLike.objects.get_or_create(
         reel=reel,
@@ -546,7 +558,7 @@ def ajax_like_reel(request, reel_id):
 
 def ajax_view_reel(request, reel_id):
     """AJAX endpoint for tracking reel views"""
-    reel = get_object_or_404(Reel, id=reel, status='published')
+    reel = get_object_or_404(Reel, id=reel_id, status='published')
     
     # Track view
     ReelView.objects.create(
@@ -555,8 +567,15 @@ def ajax_view_reel(request, reel_id):
         ip_address=request.META.get('REMOTE_ADDR'),
         user_agent=request.META.get('HTTP_USER_AGENT', '')
     )
-    
+    # Increment the aggregate view count (best-effort)
+    reel.view_count = F('view_count') + 1
+    reel.save(update_fields=['view_count'])
+    # Refresh from DB to get the actual integer value
+    reel.refresh_from_db()
+
     return JsonResponse({
         'success': True,
-        'view_count': reel.view_count + 1,  # Approximate
+        'view_count': reel.view_count,
     })
+    
+    

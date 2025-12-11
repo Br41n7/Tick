@@ -46,6 +46,74 @@ document.addEventListener('DOMContentLoaded', function() {
             form.classList.add('was-validated');
         });
     });
+
+    // Initialize GLightbox if available
+    try {
+        if (typeof GLightbox !== 'undefined') {
+            const lightbox = GLightbox({ selector: '.glightbox' });
+            // Track view when slide opens
+            lightbox.on('open', function() {
+                try {
+                    const active = lightbox.getActiveSlide && lightbox.getActiveSlide();
+                    const node = active && active.node;
+                    const reelId = node && node.dataset && node.dataset.reelId;
+                    if (reelId) {
+                        trackReelView(reelId);
+                    }
+                } catch (err) {
+                    console.warn('Error tracking reel view:', err);
+                }
+            });
+            // Also track when slide is changed (e.g., next/prev)
+            lightbox.on('slide_changed', function({ current }) {
+                try {
+                    const node = current && current.node;
+                    const reelId = node && node.dataset && node.dataset.reelId;
+                    if (reelId) {
+                        trackReelView(reelId);
+                    }
+                } catch (err) {
+                    console.warn('Error tracking reel view:', err);
+                }
+            });
+        }
+    } catch (e) {
+        console.warn('GLightbox initialization failed:', e);
+    }
+
+    // Attach follow buttons to toggleFollow using direct listeners (for existing elements)
+    document.querySelectorAll('.follow-artist-btn, .follow-btn, .btn.follow-artist-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const artistId = this.dataset.artistId || this.getAttribute('data-artist-id');
+            if (artistId) {
+                toggleFollow(artistId, this);
+            }
+        });
+    });
+
+    // Also support event delegation for dynamically loaded follow buttons
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.follow-artist-btn, .follow-btn, .btn.follow-artist-btn');
+        if (btn) {
+            e.preventDefault();
+            const artistId = btn.dataset.artistId || btn.getAttribute('data-artist-id');
+            if (artistId) {
+                toggleFollow(artistId, btn);
+            }
+        }
+    });
+
+    // Attach like buttons to toggleLike
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reelId = this.dataset.reelId || this.getAttribute('data-reel-id');
+            if (reelId) {
+                toggleLike(reelId, this);
+            }
+        });
+    });
 });
 
 // AJAX Functions

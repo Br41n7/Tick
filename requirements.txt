@@ -26,3 +26,4 @@ django-debug-toolbar
 # API
 djangorestframework
 drf-spectacular
+djangorestframework-simplejwt

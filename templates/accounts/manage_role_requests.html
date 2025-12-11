@@ -19,7 +19,7 @@
     </div>
 
     <div class="list-group">
-      {% for req in requests %}
+          {% for req in requests %}
       <div class="list-group-item d-flex justify-content-between align-items-center">
         <div>
           <div class="fw-bold">{{ req.user.get_full_name }} &lt;{{ req.user.email }}&gt;</div>
@@ -28,7 +28,7 @@
         </div>
         <div class="text-end">
           {% if req.kyc_document %}
-            <a href="{{ req.kyc_document.url }}" class="btn btn-sm btn-outline-primary mb-2" target="_blank">View KYC</a>
+            <button type="button" class="btn btn-sm btn-outline-primary mb-2 btn-preview" data-doc-url="{{ req.kyc_document.url }}" data-doc-name="{{ req.user.get_full_name }} - KYC">View KYC</button>
           {% endif %}
           <div class="d-flex flex-column">
             <a href="{% url 'accounts:verify_kyc' req.pk %}" class="btn btn-sm btn-warning mb-1">Verify KYC</a>
@@ -43,3 +43,61 @@
   </div>
 </div>
 {% endblock %}
+
+<!-- Document preview modal (reused markup) -->
+<div class="modal fade" id="docPreviewModal" tabindex="-1" aria-labelledby="docPreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="docPreviewModalLabel">Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="docPreviewBody">
+        <div class="text-center text-muted">Loading preview…</div>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="docDownloadLink" class="btn btn-primary" target="_blank" rel="noopener">Open / Download</a>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function(){
+    function getExtension(url){
+      try{
+        const clean = url.split('?')[0].split('#')[0];
+        const parts = clean.split('.');
+        return parts.length>1 ? parts.pop().toLowerCase() : '';
+      }catch(e){return ''}
+    }
+    function buildPreviewContent(url, name){
+      const ext = getExtension(url);
+      if(['jpg','jpeg','png','gif','webp'].includes(ext)){
+        return `<img src="${url}" alt="${name}" class="img-fluid rounded" style="max-height:75vh; width:100%; object-fit:contain;" />`;
+      }
+      if(ext === 'pdf'){
+        return `<iframe src="${url}" style="width:100%; height:75vh; border:0;" aria-label="${name}"></iframe>`;
+      }
+      return `<div class="p-3"><p class="mb-3">Preview not available for this file type.</p><a href="${url}" target="_blank" rel="noopener" class="btn btn-primary">Open file</a></div>`;
+    }
+    document.addEventListener('click', function(e){
+      const btn = e.target.closest('.btn-preview');
+      if(!btn) return;
+      e.preventDefault();
+      const url = btn.getAttribute('data-doc-url');
+      const name = btn.getAttribute('data-doc-name') || 'Document';
+      const modalEl = document.getElementById('docPreviewModal');
+      const body = document.getElementById('docPreviewBody');
+      const title = document.getElementById('docPreviewModalLabel');
+      const download = document.getElementById('docDownloadLink');
+      if(!modalEl || !body) return;
+      title.textContent = name;
+      body.innerHTML = '<div class="text-center text-muted">Loading preview…</div>';
+      download.href = url;
+      try{ body.innerHTML = buildPreviewContent(url, name); }catch(err){ body.innerHTML = '<div class="text-muted">Unable to preview this file.</div>'; }
+      try{ const modal = new bootstrap.Modal(modalEl); modal.show(); }catch(err){ window.open(url, '_blank'); }
+    });
+  })();
+</script>

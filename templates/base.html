@@ -12,6 +12,8 @@
     
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <!-- GLightbox CSS (for reel playback) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -171,10 +173,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- GLightbox JS -->
+    <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
     
     {% load static %}
     <script src="{% static 'js/main.js' %}"></script>
     
     {% block extra_js %}{% endblock %}
+    <!-- Ensure CSRF cookie is set by rendering token in a hidden form -->
+    <form style="display:none">{% csrf_token %}</form>
 </body>
 </html>

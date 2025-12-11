@@ -32,6 +32,8 @@ urlpatterns = [
     # Role upgrade requests
     path('upgrade-request/', views.request_role_upgrade, name='request_role_upgrade'),
     path('upgrade-requests/', views.my_upgrade_requests, name='my_upgrade_requests'),
+    path('upgrade-requests/<int:pk>/', views.upgrade_request_detail, name='upgrade_request_detail'),
+    path('upgrade-requests/<int:pk>/cancel/', views.cancel_upgrade_request, name='cancel_upgrade_request'),
     
     # Host dashboard
     path('host/dashboard/', views.host_dashboard, name='host_dashboard'),

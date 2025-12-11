@@ -41,8 +41,19 @@
                     <div>Click to choose a video or drag it here</div>
                     <div class="small">Supported: MP4, MOV. Max 200MB</div>
                 </div>
-                <input type="file" name="video" id="id_video" accept="video/*" style="display:none">
-                {% if form.video.errors %}<div class="text-danger">{{ form.video.errors.0 }}</div>{% endif %}
+                <!-- Match form field names: EventForm expects 'video_file' and 'content_type' -->
+                <input type="file" name="video_file" id="id_video" accept="video/*" style="display:none">
+                {% if form.video_file.errors %}<div class="text-danger">{{ form.video_file.errors.0 }}</div>{% endif %}
+                <input type="hidden" name="content_type" value="video">
+                <!-- Allow toggles matching form fields -->
+                <div class="form-check mt-2">
+                    <input type="checkbox" name="allow_comments" id="allow_comments" class="form-check-input" checked>
+                    <label for="allow_comments" class="form-check-label">Allow comments</label>
+                </div>
+                <div class="form-check mt-1">
+                    <input type="checkbox" name="allow_downloads" id="allow_downloads" class="form-check-input">
+                    <label for="allow_downloads" class="form-check-label">Allow downloads</label>
+                </div>
                 <div id="preview" class="preview"></div>
             </div>
 
