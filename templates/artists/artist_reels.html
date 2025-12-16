@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}{{ artist.name }} Reels{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">{{ artist.name }} Reels</h2>
+    <div class="row">
+        {% for reel in reels %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <video class="card-img-top" controls>
+                    <source src="{{ reel.video.url }}" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                <div class="card-body">
+                    <h5 class="card-title">{{ reel.title }}</h5>
+                    <p class="card-text">{{ reel.description }}</p>
+
+                    <p class="card-text"><small class="text-muted">Views: {{ reel.view_count }}</small></p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p>No reels available for this artist.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

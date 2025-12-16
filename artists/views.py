@@ -579,3 +579,15 @@ def ajax_view_reel(request, reel_id):
     })
     
     
+
+def reels_feed(request, slug):
+    
+    reel = get_object_or_404(Reel, slug=slug, status='published')
+    popular_reels = request.reel.all().order_by('view_count')
+    
+    context = {
+        'reels': reels,
+        'popular_reels': popular_reels,
+    }
+    return render(request, 'artists/reels_feed.html', context)
+

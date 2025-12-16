@@ -37,11 +37,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'events:event_list' %}">Events</a>
                     </li>
-                    {% comment %}
+                    
                          <li class="nav-item">
                         <a class="nav-link" href="{% url 'artists:artist_list' %}">Artists</a>
                     </li>
+                    </li>
+                    {% comment %}
+                          <li class="nav-item">
+                        <a class="nav-link" href="{% url 'artists:reels_feed' %}">Reels</a>
+                    </li>
                     {% endcomment %}
+                       
                    
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'core:about' %}">About</a>

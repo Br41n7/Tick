@@ -380,7 +380,7 @@
                     <button class="btn btn-sm follow-btn" data-artist-id="{{ artist.id }}" id="followBtn">
                         <i class="bi bi-person-plus"></i> Follow
                     </button>
-                    <a href="{% url 'artists:reels_feed' %}" class="btn btn-sm btn-outline-light">
+                    <a href="{% url 'artists:artist_reels' slug=artist.slug %}" class="btn btn-sm btn-outline-light">
                         <i class="bi bi-film"></i> View Reels
                     </a>
                 </div>

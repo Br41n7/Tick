@@ -24,6 +24,7 @@ urlpatterns = [
 
     # Reel detail and actions
      path('reel/<slug:slug>/', views.reel_detail, name='reel_detail'),
+     path('reel/slug:slug>/feeds', views.reels_feed, name='reels_feed'),
      path('reel/<slug:slug>/like/', views.like_reel, name='like_reel'),
      path('reel/<slug:slug>/share/', views.share_reel, name='share_reel'),
 

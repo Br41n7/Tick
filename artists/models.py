@@ -94,7 +94,7 @@ class Reel(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['-created_at', 'view_count']
 
     def save(self, *args, **kwargs):
         if not self.slug:
